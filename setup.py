@@ -1,11 +1,16 @@
 import setuptools
+import os
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
+version = {}
+with open(os.path.join(os.path.dirname(__file__), "src", "_version.py")) as f:
+    exec(f.read(), version)
+
 setuptools.setup(
     name="ptt-mcp-server",
-    version="0.1.0",
+    version=version["__version__"],
     author="CodingMan",  # 請替換成您的名字
     author_email="pttcodingman@gmail.com",  # 請替換成您的電子郵件
     description="A MCP server for PTT.",
@@ -21,8 +26,13 @@ setuptools.setup(
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: MIT License",  # 您可以選擇適合的授權條款
+        "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
     python_requires=">=3.10",
+    entry_points={
+        "console_scripts": [
+            "ptt-mcp-server=mcp_server:main",
+        ],
+    },
 )
