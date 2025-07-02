@@ -31,13 +31,14 @@ jobs:
       - name: Build package
         run: |
           python -m build
-#      - name: Publish package to TestPyPI
-#        if: github.event_name == 'workflow_dispatch' || github.event.pushed == false
-#        uses: pypa/gh-action-pypi-publish@release/v1
-#        with:
-#          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
-#          repository_url: https://test.pypi.org/legacy/
+      - name: Publish package to TestPyPI
+        if: github.event_name == 'workflow_dispatch'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+          repository_url: https://test.pypi.org/legacy/
       - name: Publish package
+        if: github.event_name == 'push'
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           password: ${{ secrets.PYPI_API_TOKEN }}
