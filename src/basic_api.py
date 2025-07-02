@@ -74,7 +74,7 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
             return _handle_ptt_exception(e, {})
 
     @mcp.tool()
-    def get_post(board: str, aid: Optional[str] = None, index: int = 0) -> Dict[str, Any]:
+    def get_post(board: str, aid: Optional[str] = None, index: int = 0, search_list: List[Tuple[str, str]] = None, query: bool = False) -> Dict[str, Any]:
         """
         從 PTT 取得指定文章。
 
@@ -82,15 +82,34 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
 
         Args:
             board (str): 文章所在的看板名稱。
-            aid (str): 文章的 ID (AID).
-            index (int): 文章的索引，從 1 開始。
+            aid (str, optional): 文章的 ID (AID)。與 `index` 擇一使用。
+            index (int, optional): 文章的索引，從 1 開始。與 `aid` 擇一使用。
+            search_list (List[Tuple[str, str]], optional): 搜尋條件清單。每個元組包含搜尋類型和搜尋條件。
+                                                            搜尋類型可為 "KEYWORD" (關鍵字)、"AUTHOR" (作者)、
+                                                            "COMMENT" (推文數，例如 "100" 或 "M" 代表爆文)、
+                                                            "MONEY" (P幣，例如 "5")。
+                                                            範例: [("KEYWORD", "PyPtt")], [("AUTHOR", "CodingMan")],
+                                                            [("COMMENT", "100")], [("COMMENT", "M")], [("MONEY", "5")]。
+            query (bool): 是否為查詢模式。如果是需要文章代碼(AID)、文章網址、文章值多少 Ptt 幣、文章編號(index)，就可以使用查詢模式，速度會快很多。
+
 
         Returns:
             Dict[str, Any]: 一個包含文章資料的字典，或是在失敗時回傳錯誤訊息。
-                            成功: {'success': True, 'data': {...}}
-                            失敗: {'success': False, 'message': '...', 'code': '...'}
+                            成功時，'data' 鍵包含文章詳細資訊，例如：
+                            {'success': True, 'data': {
+                                'board': '看板名稱',
+                                'aid': '文章ID',
+                                'index': 文章索引,
+                                'author': '作者',
+                                'title': '文章標題',
+                                'content': '文章內容',
+                                'date': '發文日期',
+                                'comments': [...] # 推文列表
+                            }}
+                            失敗時: {'success': False, 'message': '...', 'code': '...'}
         """
         return _call_ptt_service(memory_storage, 'get_post', board=board, aid=aid, index=index,
+                                 search_list=search_list, query=query,
                                  empty_data_message='找不到文章或文章可能已被刪除', empty_data_code='POST_NOT_FOUND')
 
     @mcp.tool()
@@ -102,13 +121,18 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
         必須先登入 PTT。
 
         Args:
-            index_type (str): 編號類型 (BOARD, MAIL)。
-            board (str): 看板名稱 (當 index_type 為 BOARD 時需要)。
-            search_list (List[Tuple[str, str]]): 搜尋清單，例如: [("KEYWORD", "PyPtt")], [("AUTHOR", "CodingMan")], [("COMMENT", "100")], [("COMMENT", "M")], [("MONEY", "5")]
+            index_type (str): 編號類型，可為 "BOARD" (看板文章) 或 "MAIL" (信箱信件)。
+            board (str, optional): 看板名稱。當 `index_type` 為 "BOARD" 時需要提供。
+            search_list (List[Tuple[str, str]], optional): 搜尋條件清單。每個元組包含搜尋類型和搜尋條件，不同搜尋條件取得的編號(index) 會不同。
+                                                            搜尋類型可為 "KEYWORD" (關鍵字)、"AUTHOR" (作者)、
+                                                            "COMMENT" (推文數，例如 "100" 或 "M" 代表爆文)、
+                                                            "MONEY" (P幣，例如 "5")。
+                                                            範例: [("KEYWORD", "PyPtt")], [("AUTHOR", "CodingMan")],
+                                                            [("COMMENT", "100")], [("COMMENT", "M")], [("MONEY", "5")]。
 
         Returns:
             Dict[str, Any]: 一個包含最新編號的字典，或是在失敗時回傳錯誤訊息。
-                            成功: {'success': True, 'newest_index': ...}
+                            成功: {'success': True, 'newest_index': 最新編號}
                             失敗: {'success': False, 'message': '...', 'code': '...'}
         """
         call_args: Dict[str, Any] = {
@@ -136,11 +160,17 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
         必須先登入 PTT。
 
         Args:
-            board (str): 需要查詢的看板名稱。
-            title_index (int): 文章標題編號。
+            board (str): 需要發文的看板名稱。
+            title_index (int): 文章標題分類編號。例如，在某些看板中，1 可能代表「問題」，2 代表「討論」等。
             title (str): 文章標題。
             content (str): 文章內容。
-            sign_file (str | int): 編號或隨機簽名檔 (x)，預設為 0 (不選)。
+            sign_file (str | int, optional): 簽名檔編號或隨機簽名檔 (x)。預設為 "0" (不選用簽名檔)。
+                                            可用的值為 "0" 到 "9" 的數字字串，或 "x"。
+
+        Returns:
+            Dict[str, Any]: 一個包含操作結果的字典。
+                            成功: {'success': True, 'message': '發文成功'}
+                            失敗: {'success': False, 'message': '...', 'code': '...'}
         """
         return _call_ptt_service(memory_storage, 'post', success_message='發文成功', board=board,
                                  title_index=title_index, title=title, content=content,
@@ -155,12 +185,18 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
         必須先登入 PTT。
 
         Args:
-            reply_to: 回復到看板、信箱或者皆是，BOARD、EMAIL、BOARD_MAIL
-            board (str): 需要查詢的看板名稱。
-            content (str): 文章內容。
-            sign_file (str | int): 編號或隨機簽名檔 (x)，預設為 0 (不選)。
-            aid (str): 文章的 ID (AID).
-            index (int): 文章的索引，從 1 開始。
+            reply_to (str): 回覆目標，可為 "BOARD" (回覆到看板)、"EMAIL" (回覆到信箱) 或 "BOARD_MAIL" (同時回覆到看板和信箱)。
+            board (str): 文章所在的看板名稱。
+            content (str): 回覆內容。
+            sign_file (str | int, optional): 簽名檔編號或隨機簽名檔 (x)。預設為 "0" (不選用簽名檔)。
+                                            可用的值為 "0" 到 "9" 的數字字串，或 "x"。
+            aid (str, optional): 文章的 ID (AID)。與 `index` 擇一使用。
+            index (int, optional): 文章的索引，從 1 開始。與 `aid` 擇一使用。
+
+        Returns:
+            Dict[str, Any]: 一個包含操作結果的字典。
+                            成功: {'success': True, 'message': '回覆成功'}
+                            失敗: {'success': False, 'message': '...', 'code': '...'}
         """
         return _call_ptt_service(memory_storage, 'reply_post', success_message='回覆成功', reply_to=reply_to,
                                  board=board, content=content, sign_file=sign_file,
@@ -174,9 +210,9 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
         必須先登入 PTT。
 
         Args:
-            board (str): 看板名稱。
-            aid (str): 文章編號。
-            index (int): 文章編號。
+            board (str): 文章所在的看板名稱。
+            aid (str, optional): 文章的 ID (AID)。與 `index` 擇一使用。
+            index (int, optional): 文章的索引，從 1 開始。與 `aid` 擇一使用。
 
         Returns:
             Dict[str, Any]: 一個包含操作結果的字典。
@@ -190,16 +226,16 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
     def comment(board: str, comment_type: str, content: str, aid: Optional[str] = None, index: int = 0) -> Dict[
         str, Any]:
         """
-        推文。
+        對文章進行推文、噓文或箭頭。
 
         必須先登入 PTT。
 
         Args:
-            board (str): 看板名稱。
-            comment_type (str): 推文類型 (PUSH, BOO, ARROW)。
+            board (str): 文章所在的看板名稱。
+            comment_type (str): 推文類型，可為 "PUSH" (推)、"BOO" (噓) 或 "ARROW" (箭頭)。
             content (str): 推文內容。
-            aid (str): 文章編號。
-            index (int): 文章編號。
+            aid (str, optional): 文章的 ID (AID)。與 `index` 擇一使用。
+            index (int, optional): 文章的索引，從 1 開始。與 `aid` 擇一使用。
 
         Returns:
             Dict[str, Any]: 一個包含操作結果的字典。
@@ -214,16 +250,17 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
     @mcp.tool()
     def mail(ptt_id: str, title: str, content: str, sign_file: str = "0", backup: bool = True) -> Dict[str, Any]:
         """
-        寄信。
+        寄送站內信。
 
         必須先登入 PTT。
 
         Args:
-            ptt_id (str): PTT ID。
+            ptt_id (str): 收件人的 PTT ID。
             title (str): 信件標題。
             content (str): 信件內容。
-            sign_file (str | int): 編號或隨機簽名檔 (x)，預設為 0 (不選)。
-            backup (bool): 如果是 True 寄信時將會備份信件，預設為 True。
+            sign_file (str | int, optional): 簽名檔編號或隨機簽名檔 (x)。預設為 "0" (不選用簽名檔)。
+                                            可用的值為 "0" 到 "9" 的數字字串，或 "x"。
+            backup (bool, optional): 是否備份信件。預設為 True。
 
         Returns:
             Dict[str, Any]: 一個包含操作結果的字典。
@@ -243,13 +280,26 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
 
         Args:
             index (int): 信件編號。
-            search_type (str): 搜尋類型 (KEYWORD, AUTHOR)。
-            search_condition (str): 搜尋條件。
-            search_list (List[Tuple[str, str]]): 搜尋清單，例如 [("KEYWORD", "PyPtt")], [("AUTHOR", "CodingMan")]。
+            search_type (str, optional): 搜尋類型，可為 "KEYWORD" (關鍵字) 或 "AUTHOR" (作者)。
+                                         如果提供了 `search_list`，則此參數會被忽略。
+            search_condition (str, optional): 搜尋條件。如果提供了 `search_list`，則此參數會被忽略。
+            search_list (List[Tuple[str, str]], optional): 搜尋清單。每個元組包含搜尋類型和搜尋條件。
+                                                            搜尋類型可為 "KEYWORD" (關鍵字) 或 "AUTHOR" (作者)。
+                                                            範例: [("KEYWORD", "PyPtt")], [("AUTHOR", "CodingMan")]。
 
         Returns:
             Dict[str, Any]: 一個包含信件資料的字典，或是在失敗時回傳錯誤訊息。
-                            成功: {'success': True, 'data': {...}}
+                            成功時，'data' 鍵包含信件詳細資訊，例如：
+                            {'success': True, 'data': {
+                                'origin_mail': '原始信件內容',
+                                'author': '寄件人',
+                                'title': '信件標題',
+                                'date': '寄件日期',
+                                'content': '信件內文',
+                                'ip': '寄件IP',
+                                'location': '寄件地點',
+                                'is_red_envelope': 是否為紅包信
+                            }}
                             失敗: {'success': False, 'message': '...', 'code': '...'}
         """
         call_args: Dict[str, Any] = {
@@ -292,15 +342,15 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
                    red_bag_content: Optional[str] = None) -> \
             Dict[str, Any]:
         """
-        轉帳，詳見 P 幣。
+        轉帳 Ptt 幣給指定使用者。
 
         必須先登入 PTT。
 
         Args:
-            ptt_id (str): PTT ID。
+            ptt_id (str): 接收 Ptt 幣的使用者 ID。
             money (int): 轉帳金額。
-            red_bag_title (str): 紅包標題。
-            red_bag_content (str): 紅包內容。
+            red_bag_title (str, optional): 紅包標題。如果提供，將會以紅包形式轉帳。
+            red_bag_content (str, optional): 紅包內容。如果提供，將會以紅包形式轉帳。
 
         Returns:
             Dict[str, Any]: 一個包含操作結果的字典。
@@ -329,11 +379,26 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
         必須先登入 PTT。
 
         Args:
-            user_id (str): 使用者 ID。
+            user_id (str): 目標使用者的 PTT ID。
 
         Returns:
             Dict[str, Any]: 一個包含使用者資料的字典，或是在失敗時回傳錯誤訊息。
-                            成功: {'success': True, 'data': {...}}
+                            成功時，'data' 鍵包含使用者詳細資訊，例如：
+                            {'success': True, 'data': {
+                                'ptt_id': '使用者ID',
+                                'money': Ptt幣餘額,
+                                'login_count': 登入次數,
+                                'account_verified': 帳號是否認證,
+                                'legal_post': 有效文章數,
+                                'illegal_post': 退文數 (PTT1 獨有),
+                                'activity': 目前動態,
+                                'mail': 私人信箱狀態,
+                                'last_login_date': 上次上站日期,
+                                'last_login_ip': 上次上站IP,
+                                'five_chess': 五子棋戰績,
+                                'chess': 象棋戰績,
+                                'signature_file': 簽名檔內容
+                            }}
                             失敗: {'success': False, 'message': '...', 'code': '...'}
         """
         return _call_ptt_service(memory_storage, 'get_user', user_id=user_id,
@@ -347,13 +412,14 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
         必須先登入 PTT。
 
         Args:
-            ptt_id (str): PTT ID。
-            min_page (int): 最小頁數。
-            max_page (int): 最大頁數。
+            ptt_id (str): 欲搜尋的 PTT ID 關鍵字。
+            min_page (int, optional): 最小頁數，從 1 開始。預設為 1。
+            max_page (int, optional): 最大頁數。預設為搜尋到的最後一頁。
 
         Returns:
             Dict[str, Any]: 一個包含搜尋結果的字典，或是在失敗時回傳錯誤訊息。
-                            成功: {'success': True, 'data': [...]}
+                            成功時，'data' 鍵包含符合條件的使用者 ID 列表，例如：
+                            {'success': True, 'data': ['user1', 'user2', ...]}
                             失敗: {'success': False, 'message': '...', 'code': '...'}
         """
 
@@ -369,12 +435,12 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
     @mcp.tool()
     def change_pw(new_password: str) -> Dict[str, Any]:
         """
-        更改密碼。
+        更改 PTT 登入密碼。
 
         必須先登入 PTT。
 
         Args:
-            new_password (str): 新密碼。
+            new_password (str): 新密碼。密碼長度限制為 8 個字元。
 
         Returns:
             Dict[str, Any]: 一個包含操作結果的字典。
@@ -392,7 +458,7 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
 
         Returns:
             Dict[str, Any]: 一個包含 PTT 系統時間的字典，或是在失敗時回傳錯誤訊息。
-                            成功: {'success': True, 'data': '...'}
+                            成功: {'success': True, 'data': 'HH:MM'} (例如: {'success': True, 'data': '14:30'})
                             失敗: {'success': False, 'message': '...', 'code': '...'}
         """
         return _call_ptt_service(memory_storage, 'get_time', success_message='取得 PTT 系統時間成功')
@@ -400,13 +466,14 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
     @mcp.tool()
     def get_all_boards() -> Dict[str, Any]:
         """
-        取得全站看板清單。
+        取得 PTT 全站看板清單。
 
         必須先登入 PTT。
 
         Returns:
             Dict[str, Any]: 一個包含看板清單的字典，或是在失敗時回傳錯誤訊息。
-                            成功: {'success': True, 'data': [...]}
+                            成功時，'data' 鍵包含看板名稱列表，例如：
+                            {'success': True, 'data': ['Board1', 'Board2', ...]}
                             失敗: {'success': False, 'message': '...', 'code': '...'}
         """
         return _call_ptt_service(memory_storage, 'get_all_boards', empty_data_message='無法取得看板清單',
@@ -415,13 +482,17 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
     @mcp.tool()
     def get_favourite_boards() -> Dict[str, Any]:
         """
-        取得我的最愛清單。
+        取得我的最愛看板清單。
 
         必須先登入 PTT。
 
         Returns:
             Dict[str, Any]: 一個包含收藏看板清單的字典，或是在失敗時回傳錯誤訊息。
-                            成功: {'success': True, 'data': [...]}
+                            成功時，'data' 鍵包含收藏看板的列表，每個看板是一個字典，例如：
+                            {'success': True, 'data': [
+                                {'board': '看板名稱', 'type': '看板類型', 'title': '看板標題'},
+                                ...
+                            ]}
                             失敗: {'success': False, 'message': '...', 'code': '...'}
         """
         return _call_ptt_service(memory_storage, 'get_favourite_boards', empty_data_message='無法取得我的最愛清單',
@@ -436,11 +507,35 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
 
         Args:
             board (str): 看板名稱。
-            get_post_types (bool): 是否取得文章類型，例如：八卦板的「問卦」。
+            get_post_types (bool, optional): 是否取得文章類型，例如：八卦板的「問卦」。預設為 False。
 
         Returns:
             Dict[str, Any]: 一個包含看板資訊的字典，或是在失敗時回傳錯誤訊息。
-                            成功: {'success': True, 'data': {...}}
+                            成功時，'data' 鍵包含看板詳細資訊，例如：
+                            {'success': True, 'data': {
+                                'board': '看板名稱',
+                                'online_user': 在線人數,
+                                'mandarin_des': '中文敘述',
+                                'moderators': ['板主1', '板主2', ...],
+                                'open_status': 是否公開,
+                                'into_top_ten_when_hide': 隱板時是否可進十大,
+                                'can_non_board_members_post': 非看板會員是否可發文,
+                                'can_reply_post': 是否可回應文章,
+                                'self_del_post': 是否可自刪文章,
+                                'can_comment_post': 是否可推文,
+                                'can_boo_post': 是否可噓文,
+                                'can_fast_push': 是否可快速連推,
+                                'min_interval_between_comments': 推文最短間隔時間,
+                                'is_comment_record_ip': 推文是否記錄IP,
+                                'is_comment_aligned': 推文是否對齊,
+                                'can_moderators_del_illegal_content': 板主是否可刪除違規文字,
+                                'does_tran_post_auto_recorded_and_require_post_permissions': 轉錄文章是否自動記錄並需發文權限,
+                                'is_cool_mode': 是否為冷靜模式,
+                                'is_require18': 是否限制18歲以下進入,
+                                'require_login_time': 發文限制登入次數,
+                                'require_illegal_post': 發文限制退文篇數,
+                                'post_kind_list': 文章類型列表 (如果 get_post_types 為 True)
+                            }}
                             失敗: {'success': False, 'message': '...', 'code': '...'}
         """
 
@@ -455,14 +550,15 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
     @mcp.tool()
     def get_aid_from_url(url: str) -> Dict[str, Any]:
         """
-        從網址取得看板名稱與文章編號。
+        從 PTT 文章網址中解析出看板名稱與文章 AID。
 
         Args:
-            url (str): 網址。
+            url (str): PTT 文章的完整 URL，例如 "https://www.ptt.cc/bbs/BoardName/M.1234567890.A.BCD.html"。
 
         Returns:
-            Dict[str, Any]: 一個包含看板名稱與文章編號的字典，或是在失敗時回傳錯誤訊息。
-                            成功: {'success': True, 'data': [board, aid]}
+            Dict[str, Any]: 一個包含看板名稱與文章 AID 的字典，或是在失敗時回傳錯誤訊息。
+                            成功時，'data' 鍵包含一個列表，其中第一個元素是看板名稱，第二個元素是文章 AID，例如：
+                            {'success': True, 'data': ['BoardName', 'M.1234567890.A.BCD']}
                             失敗: {'success': False, 'message': '...', 'code': '...'}
         """
         return _call_ptt_service(memory_storage, 'get_aid_from_url', url=url,
@@ -481,7 +577,11 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
 
         Returns:
             Dict[str, Any]: 一個包含置底文章清單的字典，或是在失敗時回傳錯誤訊息。
-                            成功: {'success': True, 'data': [...]}
+                            成功時，'data' 鍵包含置底文章的列表，每篇文章是一個字典，包含文章的詳細資訊，例如：
+                            {'success': True, 'data': [
+                                {'board': '看板名稱', 'aid': '文章ID', ...},
+                                ...
+                            ]}
                             失敗: {'success': False, 'message': '...', 'code': '...'}
         """
         return _call_ptt_service(memory_storage, 'get_bottom_post_list', board=board,
@@ -493,11 +593,11 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
         """
         設定看板標題。
 
-        必須先登入 PTT。
+        必須先登入 PTT，且登入帳號需為該看板板主。
 
         Args:
             board (str): 看板名稱。
-            new_title (str): 新標題。
+            new_title (str): 新的看板標題。
 
         Returns:
             Dict[str, Any]: 一個包含操作結果的字典。
@@ -510,15 +610,15 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
     @mcp.tool()
     def bucket(board: str, bucket_days: int, reason: str, ptt_id: str) -> Dict[str, Any]:
         """
-        水桶。
+        將指定使用者水桶。
 
-        必須先登入 PTT。
+        必須先登入 PTT，且登入帳號需為該看板板主。
 
         Args:
             board (str): 看板名稱。
             bucket_days (int): 水桶天數。
             reason (str): 水桶原因。
-            ptt_id (str): PTT ID。
+            ptt_id (str): 欲水桶的 PTT ID。
 
         Returns:
             Dict[str, Any]: 一個包含操作結果的字典。

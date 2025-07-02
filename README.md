@@ -1,8 +1,12 @@
 # PTT MCP Server
 
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
+
+## Description
+
 This project is a PTT agent based on `fastmcp` and the powerful [`PyPtt`](https://pyptt.cc/) library, enabling it to truly log in and interact with the PTT bulletin board system through the MCP protocol.
 
-## Features
+## Key Features
 
 - Login and logout
 - Get, post, reply, delete, and comment on posts
@@ -11,21 +15,15 @@ This project is a PTT agent based on `fastmcp` and the powerful [`PyPtt`](https:
 - Get user, post, and board information
 - and more...
 
+## Requirements
+
+This project requires Python 3.10 or later.
+
 ## Installation
 
 ```bash
 pip install ptt-mcp-server
 ```
-
-## Usage
-
-Run the MCP server:
-
-```bash
-ptt-mcp-server
-```
-
-Then you can connect to the server with your MCP client.
 
 ### MCP Client Configuration
 
@@ -73,6 +71,10 @@ If you prefer to explicitly use a Python interpreter from a virtual environment,
 *   Replace `/path/to/your/venv/bin/python3` with the absolute path to the Python executable within your virtual environment (e.g., `/Users/codingman/git/mcp_server/.venv/bin/python3`).
 *   Replace `/path/to/your/project/src/mcp_server.py` with the absolute path to the `mcp_server.py` file within your project (e.g., `/Users/codingman/git/mcp_server/src/mcp_server.py`).
 
-## API
+## Contributing
 
-For detailed API documentation, please refer to the `basic_api.py` file.
+Contributions are welcome! Please feel free to submit a pull request or open an issue.
+
+## License
+
+This project is licensed under the MIT License.
