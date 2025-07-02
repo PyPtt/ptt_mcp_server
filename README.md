@@ -1,6 +1,6 @@
 # PTT MCP Server
 
-This project is a PTT agent based on `fastmcp` and `PyPtt`, which can operate PTT through the MCP protocol.
+This project is a PTT agent based on `fastmcp` and the powerful [`PyPtt`](https://pyptt.cc/) library, enabling it to truly log in and interact with the PTT bulletin board system through the MCP protocol.
 
 ## Features
 
@@ -13,29 +13,65 @@ This project is a PTT agent based on `fastmcp` and `PyPtt`, which can operate PT
 
 ## Installation
 
-1.  Clone the project:
-    ```bash
-    git clone https://github.com/your-username/mcp_server.git
-    ```
-2.  Install dependencies:
-    ```bash
-    pip install -r requirements.txt
-    ```
-3.  Create a `.env` file and set the following environment variables:
-    ```
-    PTT_ID=your_ptt_id
-    PTT_PW=your_ptt_password
-    ```
+```bash
+pip install ptt-mcp-server
+```
 
 ## Usage
 
 Run the MCP server:
 
 ```bash
-python src/mcp_server.py
+ptt-mcp-server
 ```
 
 Then you can connect to the server with your MCP client.
+
+### MCP Client Configuration
+
+Here is an example of how to configure your MCP client to connect to the server:
+
+```json
+{
+  "mcpServers": {
+    "PTT": {
+      "command": "ptt-mcp-server",
+      "env": {
+        "PTT_ID": "YOUR_PTT_ID",
+        "PTT_PW": "YOUR_PTT_PW"
+      }
+    }
+  }
+}
+```
+
+**Note:**
+
+*   Replace `YOUR_PTT_ID` and `YOUR_PTT_PW` with your actual PTT credentials.
+
+### Alternative MCP Client Configuration (Using a Virtual Environment)
+
+If you prefer to explicitly use a Python interpreter from a virtual environment, or if the `ptt-mcp-server` command is not directly available in your system's PATH, you can configure your MCP client as follows:
+
+```json
+{
+  "mcpServers": {
+    "PTT": {
+      "command": "/path/to/your/venv/bin/python3", // Replace with the actual path to your venv's python executable
+      "args": ["/path/to/your/project/src/mcp_server.py"], // Replace with the actual path to mcp_server.py
+      "env": {
+        "PTT_ID": "YOUR_PTT_ID",
+        "PTT_PW": "YOUR_PTT_PW"
+      }
+    }
+  }
+}
+```
+
+**Note:**
+
+*   Replace `/path/to/your/venv/bin/python3` with the absolute path to the Python executable within your virtual environment (e.g., `/Users/codingman/git/mcp_server/.venv/bin/python3`).
+*   Replace `/path/to/your/project/src/mcp_server.py` with the absolute path to the `mcp_server.py` file within your project (e.g., `/Users/codingman/git/mcp_server/src/mcp_server.py`).
 
 ## API
 
