@@ -25,7 +25,7 @@ MEMORY_STORAGE: Dict[str, Any] = {
 }
 
 def main():
-    basic_api.register_tools(mcp, MEMORY_STORAGE)
+    basic_api.register_tools(mcp, MEMORY_STORAGE, __version__)
     mcp.run()
 
 if __name__ == '__main__':

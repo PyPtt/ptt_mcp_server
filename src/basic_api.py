@@ -6,7 +6,18 @@ from fastmcp import FastMCP
 from utils import _call_ptt_service, _handle_ptt_exception
 
 
-def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any]):
+def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
+    @mcp.tool()
+    def get_version() -> Dict[str, Any]:
+        """
+        Returns the current version of the PTT MCP Server.
+
+        Returns:
+            Dict[str, Any]: A dictionary containing the version information.
+                            Example: {'success': True, 'version': '0.1.0'}
+        """
+        return {'success': True, 'version': version}
+
     @mcp.tool()
     def logout() -> Dict[str, Any]:
         """
