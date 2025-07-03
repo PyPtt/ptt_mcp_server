@@ -35,7 +35,7 @@ jobs:
       - name: Run TestPyPI auto versioning
         if: github.event_name == 'workflow_dispatch'
         run: |
-          next_version=$(python src/auto_version.py)
+          next_version=$(python src/auto_version.py --test)
           if [ -f src/_version.py ]; then
               cp src/_version.py src/_version.py.bak
           fi
