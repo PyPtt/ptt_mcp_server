@@ -26,10 +26,19 @@
 本專案扮演一個中間層的角色。您的 MCP 客戶端 (例如終端機、聊天機器人等) 會連線到本機執行的 ptt-mcp-server。伺服器收到指令後，會透過 [`PyPtt`](https://pyptt.cc/) 函式庫與 PTT 進行連線並執行相應操作，最後將結果回傳給您的客戶端。
 
 ```mermaid
-graph LR;
-    A[MCP Client] <--> B[PTT MCP Server (This Project)];
-    B <--> C[PTT.cc];
+graph LR
+    A["MCP Client"]
+    
+    subgraph B ["PTT MCP Server"]
+        D["PyPtt"]
+    end
+    
+    C["PTT.cc"]
+
+    A <--> B
+    B <--> C
 ```
+
 
 ## **✨ 詳細功能 (Features in Detail)**
 
