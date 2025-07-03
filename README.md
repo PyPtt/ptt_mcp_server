@@ -25,20 +25,22 @@
 ## ⚙️ 運作原理 (How it Works)  
 本專案扮演一個中間層的角色。您的 MCP 客戶端 (例如終端機、聊天機器人等) 會連線到本機執行的 ptt-mcp-server。伺服器收到指令後，會透過 [`PyPtt`](https://pyptt.cc/) 函式庫與 PTT 進行連線並執行相應操作，最後將結果回傳給您的客戶端。
 
-```
-[MCP Client] <--> [PTT MCP Server (This Project)] <--> [PTT.cc]
+```mermaid
+graph LR;
+    A[MCP Client] <--> B[PTT MCP Server (This Project)];
+    B <--> C[PTT.cc];
 ```
 
 ## **✨ 詳細功能 (Features in Detail)**
 
-| 功能分類 | 具體操作 | 支援狀態 |
-| :---- | :---- | :---- |
-| **帳號管理** | 登入、登出 | ✅ |
-| **文章管理** | 取得文章列表、讀取文章內容、發表新文章、刪除文章 | ✅ |
-| **文章互動** | 推文、噓文、給予箭頭、回覆文章 | ✅ |
-| **信箱系統** | 讀取信件、傳送新信件、刪除信件 | ✅ |
-| **金融系統** | 查詢 P幣、轉帳 P幣 | ✅ |
-| **資訊查詢** | 查詢使用者資訊、查詢看板資訊 | ✅ |
+| 功能分類     | 具體操作                     | 支援狀態 |
+|:---------|:-------------------------|:-----|
+| **帳號管理** | 登入、登出                    | ✅    |
+| **文章管理** | 取得文章列表、讀取文章內容、發表新文章、刪除文章 | ✅    |
+| **文章互動** | 推文、噓文、給予箭頭、回覆文章          | ✅    |
+| **信箱系統** | 讀取信件、傳送新信件、刪除信件          | ✅    |
+| **金融系統** | 查詢 P幣、轉帳 P幣              | ✅    |
+| **資訊查詢** | 查詢使用者資訊、查詢看板資訊           | ✅    |
 
 ## **📋 環境需求 (Requirements)**
 
@@ -67,16 +69,16 @@ pip install ptt-mcp-server
 安裝後 ptt-mcp-server 應該就已經在您系統的 Python 環境中，這是最簡單的設定方法。
 
 ```json
-{  
-  "mcpServers": {  
-    "PTT": {  
-      "command": "ptt-mcp-server",  
-      "env": {  
-        "PTT_ID": "YOUR_PTT_ID",  
-        "PTT_PW": "YOUR_PTT_PW"  
-      }  
-    }  
-  }  
+{
+  "mcpServers": {
+    "PTT": {
+      "command": "ptt-mcp-server",
+      "env": {
+        "PTT_ID": "YOUR_PTT_ID",
+        "PTT_PW": "YOUR_PTT_PW"
+      }
+    }
+  }
 }
 ```
 
@@ -85,31 +87,33 @@ pip install ptt-mcp-server
 如果您使用 Python 虛擬環境 (Virtual Environment)，或是 command 無法直接執行，您可以提供 Python 直譯器和腳本的絕對路徑。
 
 ```json
-{  
-  "mcpServers": {  
-    "PTT": {  
-      "command": "/path/to/your/venv/bin/python3",  
-      "args": ["/path/to/your/venv/bin/ptt-mcp-server"],   
-      "env": {  
-        "PTT_ID": "YOUR_PTT_ID",  
-        "PTT_PW": "YOUR_PTT_PW"  
-      }  
-    }  
-  }  
+{
+  "mcpServers": {
+    "PTT": {
+      "command": "/path/to/your/venv/bin/python3",
+      "args": [
+        "/path/to/your/venv/bin/ptt-mcp-server"
+      ],
+      "env": {
+        "PTT_ID": "YOUR_PTT_ID",
+        "PTT_PW": "YOUR_PTT_PW"
+      }
+    }
+  }
 }
 ```
 
 **如何找到路徑？**
 
-* **command**: 在您的虛擬環境啟動後，執行 which python3。  
+* **command**: 在您的虛擬環境啟動後，執行 which python3。
 * **args**: 在您的虛擬環境啟動後，執行 which ptt-mcp-server。
 
 ## **🗺️ 未來藍圖 (Roadmap)**
 
-* [ ] 支援更多 PTT 功能 (例如：精華區操作)。  
-* [ ] 提供 Docker 映像檔，簡化部署流程。  
-* [ ] 撰寫更完整的文件與範例。  
-* [ ] 優化效能與連線穩定性。
+- [ ] 支援更多 PTT 功能 (例如：精華區操作)。
+- [ ] 提供 Docker 映像檔，簡化部署流程。
+- [ ] 撰寫更完整的文件與範例。
+- [ ] 優化效能與連線穩定性。
 
 歡迎透過 [Issues](https://github.com/PyPtt/ptt_mcp_server/issues) 提供您的建議！
 
@@ -119,8 +123,8 @@ pip install ptt-mcp-server
 
 ## **🙏 致謝 (Acknowledgements)**
 
-* [**PyPtt**](https://pyptt.cc/) \- 驅動本專案與 PTT 互動的核心函式庫。  
-* [**fastmcp**](https://www.google.com/search?q=https://github.com/fastmcp/fastmcp-py) \- 提供高效能 MCP 伺服器框架。
+* [**PyPtt**](https://pyptt.cc/) - 驅動本專案與 PTT 互動的核心函式庫。
+* [**fastmcp**](https://github.com/jlowin/fastmcp) - 提供高效能 MCP 伺服器框架。
 
 ## **📄 授權條款 (License)**
 
