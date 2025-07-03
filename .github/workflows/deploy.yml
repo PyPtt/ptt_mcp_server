@@ -31,12 +31,36 @@ jobs:
       - name: Build package
         run: |
           python -m build
-      - name: Publish package to TestPyPI
+
+      - name: Run TestPyPI auto versioning
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          next_version=$(python src/auto_version.py)
+          if [ -f src/_version.py ]; then
+              cp src/_version.py src/_version.py.bak
+          fi
+          
+          echo "__version__ = '$next_version'" > src/_version.py
+          
+          echo "Updated version to $next_version in src/_version.py"
+
+      - name: Run TestPyPI release script
         if: github.event_name == 'workflow_dispatch'
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           password: ${{ secrets.TEST_PYPI_API_TOKEN }}
           repository_url: https://test.pypi.org/legacy/
+      - name: Restore version file
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          
+          if [ -f src/_version.py.bak ]; then
+              mv src/_version.py.bak src/_version.py
+              echo "Restored original version file from backup."
+          else
+              echo "No backup version file found."
+          fi
+          
       - name: Publish package
         if: github.event_name == 'push'
         uses: pypa/gh-action-pypi-publish@release/v1
