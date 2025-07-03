@@ -1,7 +1,7 @@
 <h1 align="center">PTT MCP Server</h1>
 
 <p align="center">
-一個基於 <code>PyPtt</code> 的強大 PTT 代理伺服器，讓您能透過 MCP 協定與 PTT 進行深度互動。
+The best MCP server for Ptt. Proudly built by [`PyPtt`](https://pyptt.cc/) developer.
 <br />
 <br />
 <a href="https://pypi.org/project/ptt-mcp-server/">
@@ -20,10 +20,10 @@
 </div>
 
 ## 📖 專案介紹 (Description)  
-本專案是一個 PTT 代理 (Agent) 伺服器，它基於功能強大的 [`PyPtt`](https://pyptt.cc/) 函式庫。這使得您的 MCP 客戶端能夠真正登入並透過 MCP 協定 (Meta-Character Protocol) 與 PTT 批踢踢實業坊進行互動，實現自動化操作。
+本專案是一個 PTT MCP (Model Context Protocol) 伺服器，它基於功能強大的 [`PyPtt`](https://pyptt.cc/) 函式庫。這使得您的 MCP 客戶端能夠真正登入 PTT 並透過 MCP 協定與 PTT 批踢踢實業坊進行實際互動，並實現自動化操作。
 
 ## ⚙️ 運作原理 (How it Works)  
-本專案扮演一個中間層的角色。您的 MCP 客戶端 (例如終端機、聊天機器人等) 會連線到本機執行的 ptt-mcp-server。伺服器收到指令後，會透過 [`PyPtt`](https://pyptt.cc/) 函式庫與 PTT 進行連線並執行相應操作，最後將結果回傳給您的客戶端。
+本專案扮演一個中間層的角色。您的 MCP 客戶端 (例如 Gemini CLI 等) 會連線到本機執行的 ptt-mcp-server。伺服器收到指令後，會透過 [`PyPtt`](https://pyptt.cc/) 函式庫與 PTT 進行連線並執行相應操作，最後將結果回傳給您的客戶端。
 
 ```mermaid
 graph LR
