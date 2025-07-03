@@ -1,7 +1,7 @@
 <h1 align="center">PTT MCP Server</h1>
 
 <p align="center">
-The best MCP server for Ptt. Proudly built by [`PyPtt`](https://pyptt.cc/) developer.
+The best MCP server for Ptt. Proudly built by <a href="PyPtt">PyPtt</a> developer.
 <br />
 <br />
 <a href="https://pypi.org/project/ptt-mcp-server/">
