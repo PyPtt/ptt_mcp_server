@@ -13,8 +13,8 @@
 <a href="https://img.shields.io/pypi/dm/ptt-mcp-server">
 <img src="https://img.shields.io/pypi/dm/ptt-mcp-server" alt="Downloads">
 </a>
-<a href="https://www.google.com/search?q=./LICENSE">
-<img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License">
+<a href="./LICENSE">
+<img src="https://img.shields.io/badge/license-BSD_3--Clause-blue.svg" alt="License">
 </a>
 </p>
 </div>
@@ -124,4 +124,4 @@ pip install ptt-mcp-server
 
 ## **📄 授權條款 (License)**
 
-本專案採用 [MIT License](https://www.google.com/search?q=./LICENSE) 授權。
+本專案採用 [BSD 3-Clause License](./LICENSE) 授權。

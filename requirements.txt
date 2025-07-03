@@ -1,3 +1,4 @@
 pyptt
 fastmcp
 python-dotenv
+requests
