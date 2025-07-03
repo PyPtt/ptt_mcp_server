@@ -1,7 +1,7 @@
 <h1 align="center">PTT MCP Server</h1>
 
 <p align="center">
-一個基於 <code>PyPtt</code> 的強大 PTT 代理伺服器，讓您能透過 MCP 協定與 PTT 進行深度互動。
+The best MCP server for Ptt. Proudly built by <a href="https://pyptt.cc/">PyPtt</a> developer.
 <br />
 <br />
 <a href="https://pypi.org/project/ptt-mcp-server/">
