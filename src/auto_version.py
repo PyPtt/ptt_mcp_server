@@ -50,15 +50,13 @@ def main():
         if "dev" not in latest_pypi_version:
             cur_version = f"{latest_pypi_version}.dev0"
         else:
-            next_num = latest_pypi_version.split("dev")[-1]
-            next_num = int(next_num) + 1
+            next_num = str(int(latest_pypi_version.split("dev")[-1]) + 1)
 
             cur_version = latest_pypi_version[
                 : latest_pypi_version.find("dev") + 3
             ] + str(next_num)
     else:
-        next_num = latest_pypi_version.split(".")[-1]
-        next_num = int(next_num) + 1
+        next_num = str(int(latest_pypi_version.split(".")[-1]) + 1)
 
         cur_version = ".".join(latest_pypi_version.split(".")[:2] + [str(next_num)])
 
