@@ -1,0 +1,48 @@
+name: Update Contributors
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  update_contributors:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Update contributor list
+        uses: akhilmhdh/contributors-readme-action@v2.3.10
+        with:
+          repo_name: PyPtt/ptt_mcp_server
+          output_path: README.md
+          commit_message: "docs: update contributors"
+          use_username: true
+          pull_request: false
+          round_images: true
+          image_size: 100
+          columns: 6
+          path_to_overwrite: README.md
+          collaborators: "all"
+          after_this: "<!-- CONTRIBUTORS_LIST -->"
+          before_this: "<!-- /CONTRIBUTORS_LIST -->"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Update contributor list for English README
+        uses: akhilmhdh/contributors-readme-action@v2.3.10
+        with:
+          repo_name: PyPtt/ptt_mcp_server
+          output_path: README_ENG.md
+          commit_message: "docs: update contributors"
+          use_username: true
+          pull_request: false
+          round_images: true
+          image_size: 100
+          columns: 6
+          path_to_overwrite: README_ENG.md
+          collaborators: "all"
+          after_this: "<!-- CONTRIBUTORS_LIST -->"
+          before_this: "<!-- /CONTRIBUTORS_LIST -->"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

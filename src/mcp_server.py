@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from fastmcp import FastMCP
 
 import basic_api
+from _version import __version__
 
 load_dotenv(override=True)
 
@@ -15,7 +16,7 @@ PTT_PW = os.getenv("PTT_PW")
 if not PTT_ID or not PTT_PW:
     raise ValueError("PTT_ID and PTT_PW environment variables must be set.")
 
-mcp: FastMCP = FastMCP("Ptt MCP Server")
+mcp: FastMCP = FastMCP(f"Ptt MCP Server v{__version__}")
 
 MEMORY_STORAGE: Dict[str, Any] = {
     "ptt_bot": None,
@@ -23,6 +24,9 @@ MEMORY_STORAGE: Dict[str, Any] = {
     'ptt_pw': PTT_PW
 }
 
-if __name__ == '__main__':
-    basic_api.register_tools(mcp, MEMORY_STORAGE)
+def main():
+    basic_api.register_tools(mcp, MEMORY_STORAGE, __version__)
     mcp.run()
+
+if __name__ == '__main__':
+    main()
