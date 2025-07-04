@@ -1,3 +1,5 @@
+[English Version](./README_ENG.md)
+
 <h1 align="center">PTT MCP Server</h1>
 
 <p align="center">
