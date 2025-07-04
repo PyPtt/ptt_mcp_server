@@ -180,6 +180,11 @@ pip install ptt-mcp-server
     4.  Push 到您的分支 (`git push origin feature/AmazingFeature`)。
     5.  開啟一個 Pull Request。
 
+## 👥 貢獻者 (Contributors)
+
+<!-- CONTRIBUTORS_LIST -->
+<!-- /CONTRIBUTORS_LIST -->
+
 ## 🙏 致謝 (Acknowledgements)
 
 * [**PyPtt**](https://pyptt.cc/) - 驅動本專案與 PTT 互動的核心函式庫。

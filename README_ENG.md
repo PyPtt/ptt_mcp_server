@@ -180,6 +180,11 @@ Contributions of any kind are welcome! Whether it's reporting an issue or submit
     4.  Push to the branch (`git push origin feature/AmazingFeature`).
     5.  Open a Pull Request.
 
+## 👥 Contributors
+
+<!-- CONTRIBUTORS_LIST -->
+<!-- /CONTRIBUTORS_LIST -->
+
 ## 🙏 Acknowledgements
 
 * [**PyPtt**](https://pyptt.cc/) - The core library that handles the interaction between this project and PTT.
