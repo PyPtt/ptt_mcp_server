@@ -4,7 +4,7 @@ from typing import Dict, Any
 from dotenv import load_dotenv
 from fastmcp import FastMCP
 
-import basic_api
+import ptt_api
 from _version import __version__
 
 load_dotenv(override=True)
@@ -21,7 +21,7 @@ MEMORY_STORAGE: Dict[str, Any] = {"ptt_bot": None, "ptt_id": PTT_ID, "ptt_pw": P
 
 
 def main():
-    basic_api.register_tools(mcp, MEMORY_STORAGE, __version__)
+    ptt_api.register_tools(mcp, MEMORY_STORAGE, __version__)
     mcp.run()
 
 

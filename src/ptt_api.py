@@ -184,6 +184,8 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
     ) -> Dict[str, Any]:
         """到看板發佈文章。
 
+        執行前務必顯示內容並與使用者確認後才可以執行。(Must display content and confirm with the user before execution.)
+
         必須先登入 PTT。
 
         Args:
@@ -222,6 +224,9 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
     ) -> Dict[str, Any]:
         """到看板回覆文章。
 
+        重要！務必遵守！執行前務必顯示內容並與使用者確認後才可以執行。
+        Important! Be sure to follow! Must display content and confirm with the user before execution.
+
         必須先登入 PTT。
 
         Args:
@@ -256,6 +261,9 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
     ) -> Dict[str, Any]:
         """刪除文章。
 
+        重要！務必遵守！執行前務必顯示內容並與使用者確認後才可以執行。
+        Important! Be sure to follow! Must display content and confirm with the user before execution.
+
         必須先登入 PTT。
 
         Args:
@@ -287,6 +295,9 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
     ) -> Dict[str, Any]:
         """對文章進行推文、噓文或箭頭。
 
+        重要！務必遵守！執行前務必顯示內容並與使用者確認後才可以執行。
+        Important! Be sure to follow! Must display content and confirm with the user before execution.
+
         必須先登入 PTT。
 
         Args:
@@ -317,6 +328,9 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
         ptt_id: str, title: str, content: str, sign_file: str = "0", backup: bool = True
     ) -> Dict[str, Any]:
         """寄送站內信。
+
+        重要！務必遵守！執行前務必顯示內容並與使用者確認後才可以執行。
+        Important! Be sure to follow! Must display content and confirm with the user before execution.
 
         必須先登入 PTT。
 
@@ -392,6 +406,9 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
     def del_mail(index: int) -> Dict[str, Any]:
         """刪除信件。
 
+        重要！務必遵守！執行前務必顯示內容並與使用者確認後才可以執行。
+        Important! Be sure to follow! Must display content and confirm with the user before execution.
+
         必須先登入 PTT。
 
         Args:
@@ -414,6 +431,9 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
         red_bag_content: Optional[str] = None,
     ) -> Dict[str, Any]:
         """轉帳 Ptt 幣給指定使用者。
+
+        重要！務必遵守！執行前務必顯示內容並與使用者確認後才可以執行。
+        Important! Be sure to follow! Must display content and confirm with the user before execution.
 
         必須先登入 PTT。
 
@@ -499,6 +519,9 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
     @mcp.tool()
     def change_pw(new_password: str) -> Dict[str, Any]:
         """更改 PTT 登入密碼。
+
+        重要！務必遵守！執行前務必顯示內容並與使用者確認後才可以執行。
+        Important! Be sure to follow! Must display content and confirm with the user before execution.
 
         必須先登入 PTT。
 
@@ -651,6 +674,9 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
     def set_board_title(board: str, new_title: str) -> Dict[str, Any]:
         """設定看板標題。
 
+        重要！務必遵守！執行前務必顯示內容並與使用者確認後才可以執行。
+        Important! Be sure to follow! Must display content and confirm with the user before execution.
+
         必須先登入 PTT，且登入帳號需為該看板板主。
 
         Args:
@@ -675,6 +701,9 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
         board: str, ptt_id: str, bucket_days: int, reason: str
     ) -> Dict[str, Any]:
         """將指定使用者水桶。
+
+        重要！務必遵守！執行前務必顯示內容並與使用者確認後才可以執行。
+        Important! Be sure to follow! Must display content and confirm with the user before execution.
 
         必須先登入 PTT，且登入帳號需為該看板板主。
 
