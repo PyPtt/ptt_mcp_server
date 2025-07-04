@@ -1,7 +1,7 @@
 name: Update Contributors
 
 on:
-  push:
+  pull_request:
     branches:
       - main
 
@@ -19,7 +19,7 @@ jobs:
           output_path: README.md
           commit_message: "docs: update contributors"
           use_username: true
-          pull_request: false
+          pull_request: true
           round_images: true
           image_size: 100
           columns: 6
@@ -36,7 +36,7 @@ jobs:
           output_path: README_ENG.md
           commit_message: "docs: update contributors"
           use_username: true
-          pull_request: false
+          pull_request: true
           round_images: true
           image_size: 100
           columns: 6
