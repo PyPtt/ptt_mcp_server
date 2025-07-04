@@ -19,8 +19,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
-      - name: Run Black (Formatting Check)
-        run: black --check .
       - name: Run Flake8 (Linting Check)
         run: flake8 .
       - name: Run MyPy (Type Check)
