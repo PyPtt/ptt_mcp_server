@@ -96,15 +96,15 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
 
     @mcp.tool()
     def get_post(
-        board: str,
-        aid: Optional[str] = None,
-        index: int = 0,
-        query: bool = False,
-        search_list: Optional[List[Tuple[str, str]]] = None,
+            board: str,
+            aid: Optional[str] = None,
+            index: int = 0,
+            query: bool = False,
+            search_list: Optional[List[Tuple[str, str]]] = None,
     ) -> Dict[str, Any]:
         """從 PTT 取得指定文章。
 
-        必須先登入 PTT。
+        註記：此函式必須先登入 PTT。
 
         Args:
             board (str): 文章所在的看板名稱。
@@ -147,13 +147,19 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
 
     @mcp.tool()
     def get_newest_index(
-        index_type: str,
-        board: Optional[str] = None,
-        search_list: Optional[List[Tuple[str, str]]] = None,
+            index_type: str,
+            board: Optional[str] = None,
+            search_list: Optional[List[Tuple[str, str]]] = None,
     ) -> Dict[str, Any]:
         """取得最新文章或信箱編號。
+        函式回傳的 newest_index 代表的是該類型 (看板文章或信箱信件) 的最大有效編號。
+        例如，如果您呼叫 get_newest_index(index_type="BOARD", board="Test") 並得到
 
-        必須先登入 PTT。
+        {'success': True, 'newest_index': 100}
+
+        ，這表示在 'Test' 看板中，文章索引從 1 到 100 都是可用的。
+
+        註記：此函式必須先登入 PTT。
 
         Args:
             index_type (str): 編號類型，可為 "BOARD" (看板文章) 或 "MAIL" (信箱信件)。
@@ -180,13 +186,13 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
 
     @mcp.tool()
     def post(
-        board: str, title_index: int, title: str, content: str, sign_file: str = "0"
+            board: str, title_index: int, title: str, content: str, sign_file: str = "0"
     ) -> Dict[str, Any]:
         """到看板發佈文章。
 
         執行前務必顯示內容並與使用者確認後才可以執行。(Must display content and confirm with the user before execution.)
 
-        必須先登入 PTT。
+        註記：此函式必須先登入 PTT。
 
         Args:
             board (str): 需要發文的看板名稱。
@@ -215,19 +221,19 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
 
     @mcp.tool()
     def reply_post(
-        board: str,
-        reply_to: str,
-        content: str,
-        aid: Optional[str] = None,
-        index: int = 0,
-        sign_file: str = "0",
+            board: str,
+            reply_to: str,
+            content: str,
+            aid: Optional[str] = None,
+            index: int = 0,
+            sign_file: str = "0",
     ) -> Dict[str, Any]:
         """到看板回覆文章。
 
         重要！務必遵守！執行前務必顯示內容並與使用者確認後才可以執行。
         Important! Be sure to follow! Must display content and confirm with the user before execution.
 
-        必須先登入 PTT。
+        註記：此函式必須先登入 PTT。
 
         Args:
             reply_to (str): 回覆目標，可為 "BOARD" (回覆到看板)、"EMAIL" (回覆到信箱) 或 "BOARD_MAIL" (同時回覆到看板和信箱)。
@@ -257,14 +263,14 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
 
     @mcp.tool()
     def del_post(
-        board: str, aid: Optional[str] = None, index: int = 0
+            board: str, aid: Optional[str] = None, index: int = 0
     ) -> Dict[str, Any]:
         """刪除文章。
 
         重要！務必遵守！執行前務必顯示內容並與使用者確認後才可以執行。
         Important! Be sure to follow! Must display content and confirm with the user before execution.
 
-        必須先登入 PTT。
+        註記：此函式必須先登入 PTT。
 
         Args:
             board (str): 文章所在的看板名稱。
@@ -287,18 +293,18 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
 
     @mcp.tool()
     def comment(
-        board: str,
-        comment_type: str,
-        content: str,
-        aid: Optional[str] = None,
-        index: int = 0,
+            board: str,
+            comment_type: str,
+            content: str,
+            aid: Optional[str] = None,
+            index: int = 0,
     ) -> Dict[str, Any]:
         """對文章進行推文、噓文或箭頭。
 
         重要！務必遵守！執行前務必顯示內容並與使用者確認後才可以執行。
         Important! Be sure to follow! Must display content and confirm with the user before execution.
 
-        必須先登入 PTT。
+        註記：此函式必須先登入 PTT。
 
         Args:
             board (str): 文章所在的看板名稱。
@@ -325,14 +331,14 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
 
     @mcp.tool()
     def mail(
-        ptt_id: str, title: str, content: str, sign_file: str = "0", backup: bool = True
+            ptt_id: str, title: str, content: str, sign_file: str = "0", backup: bool = True
     ) -> Dict[str, Any]:
         """寄送站內信。
 
         重要！務必遵守！執行前務必顯示內容並與使用者確認後才可以執行。
         Important! Be sure to follow! Must display content and confirm with the user before execution.
 
-        必須先登入 PTT。
+        註記：此函式必須先登入 PTT。
 
         Args:
             ptt_id (str): 收件人的 PTT ID。
@@ -360,14 +366,14 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
 
     @mcp.tool()
     def get_mail(
-        index: int,
-        search_type: Optional[str] = None,
-        search_condition: Optional[str] = None,
-        search_list: Optional[List[List[str]]] = None,
+            index: int,
+            search_type: Optional[str] = None,
+            search_condition: Optional[str] = None,
+            search_list: Optional[List[List[str]]] = None,
     ) -> Dict[str, Any]:
         """取得信件。
 
-        必須先登入 PTT。
+        註記：此函式必須先登入 PTT。
 
         Args:
             index (int): 信件編號。
@@ -409,7 +415,7 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
         重要！務必遵守！執行前務必顯示內容並與使用者確認後才可以執行。
         Important! Be sure to follow! Must display content and confirm with the user before execution.
 
-        必須先登入 PTT。
+        註記：此函式必須先登入 PTT。
 
         Args:
             index (int): 信件編號。
@@ -425,17 +431,17 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
 
     @mcp.tool()
     def give_money(
-        ptt_id: str,
-        money: int,
-        red_bag_title: Optional[str] = None,
-        red_bag_content: Optional[str] = None,
+            ptt_id: str,
+            money: int,
+            red_bag_title: Optional[str] = None,
+            red_bag_content: Optional[str] = None,
     ) -> Dict[str, Any]:
         """轉帳 Ptt 幣給指定使用者。
 
         重要！務必遵守！執行前務必顯示內容並與使用者確認後才可以執行。
         Important! Be sure to follow! Must display content and confirm with the user before execution.
 
-        必須先登入 PTT。
+        註記：此函式必須先登入 PTT。
 
         Args:
             ptt_id (str): 接收 Ptt 幣的使用者 ID。
@@ -462,7 +468,7 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
     def get_user(user_id: str) -> Dict[str, Any]:
         """取得使用者資訊。
 
-        必須先登入 PTT。
+        註記：此函式必須先登入 PTT。
 
         Args:
             user_id (str): 目標使用者的 PTT ID。
@@ -491,11 +497,11 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
 
     @mcp.tool()
     def search_user(
-        ptt_id: str, min_page: Optional[int] = None, max_page: Optional[int] = None
+            ptt_id: str, min_page: Optional[int] = None, max_page: Optional[int] = None
     ) -> Dict[str, Any]:
         """搜尋使用者。
 
-        必須先登入 PTT。
+        註記：此函式必須先登入 PTT。
 
         Args:
             ptt_id (str): 欲搜尋的 PTT ID 關鍵字。
@@ -523,7 +529,7 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
         重要！務必遵守！執行前務必顯示內容並與使用者確認後才可以執行。
         Important! Be sure to follow! Must display content and confirm with the user before execution.
 
-        必須先登入 PTT。
+        註記：此函式必須先登入 PTT。
 
         Args:
             new_password (str): 新密碼。密碼長度限制為 8 個字元。
@@ -544,7 +550,7 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
     def get_time() -> Dict[str, Any]:
         """取得 PTT 系統時間。
 
-        必須先登入 PTT。
+        註記：此函式必須先登入 PTT。
 
         Returns:
             Dict[str, Any]: 一個包含 PTT 系統時間的字典，或是在失敗時回傳錯誤訊息。
@@ -557,7 +563,7 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
     def get_all_boards() -> Dict[str, Any]:
         """取得 PTT 全站看板清單。
 
-        必須先登入 PTT。
+        註記：此函式必須先登入 PTT。
 
         Returns:
             Dict[str, Any]: 一個包含看板清單的字典，或是在失敗時回傳錯誤訊息。
@@ -571,7 +577,7 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
     def get_favourite_boards() -> Dict[str, Any]:
         """取得我的最愛看板清單。
 
-        必須先登入 PTT。
+        註記：此函式必須先登入 PTT。
 
         Returns:
             Dict[str, Any]: 一個包含收藏看板清單的字典，或是在失敗時回傳錯誤訊息。
@@ -588,7 +594,7 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
     def get_board_info(board: str, get_post_types: bool = False) -> Dict[str, Any]:
         """取得看板資訊。
 
-        必須先登入 PTT。
+        註記：此函式必須先登入 PTT。
 
         Args:
             board (str): 看板名稱。
@@ -654,7 +660,7 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
     def get_bottom_post_list(board: str) -> Dict[str, Any]:
         """取得看板置底文章清單。
 
-        必須先登入 PTT。
+        註記：此函式必須先登入 PTT。
 
         Args:
             board (str): 看板名稱。
@@ -698,7 +704,7 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
 
     @mcp.tool()
     def bucket(
-        board: str, ptt_id: str, bucket_days: int, reason: str
+            board: str, ptt_id: str, bucket_days: int, reason: str
     ) -> Dict[str, Any]:
         """將指定使用者水桶。
 
