@@ -18,15 +18,13 @@ if not PTT_ID or not PTT_PW:
 
 mcp: FastMCP = FastMCP(f"Ptt MCP Server v{__version__}")
 
-MEMORY_STORAGE: Dict[str, Any] = {
-    "ptt_bot": None,
-    'ptt_id': PTT_ID,
-    'ptt_pw': PTT_PW
-}
+MEMORY_STORAGE: Dict[str, Any] = {"ptt_bot": None, "ptt_id": PTT_ID, "ptt_pw": PTT_PW}
+
 
 def main():
     basic_api.register_tools(mcp, MEMORY_STORAGE, __version__)
     mcp.run()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
