@@ -114,8 +114,8 @@ pip install ptt-mcp-server
 
 **如何找到路徑？**
 
-* **command**: 在您的虛擬環境啟動後，執行 which python3。
-* **args**: 在您的虛擬環境啟動後，執行 which ptt-mcp-server。
+* **command**: 在您的虛擬環境啟動後，執行 `which python3`。
+* **args**: 在您的虛擬環境啟動後，執行 `which ptt-mcp-server`。
 
 ## **🗺️ 未來藍圖 (Roadmap)**
 
