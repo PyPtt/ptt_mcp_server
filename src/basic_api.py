@@ -1,4 +1,4 @@
-from typing import Dict, Any, Optional, List, Tuple, cast
+from typing import Dict, Any, Optional, List, Tuple
 
 import PyPtt  # type: ignore
 from fastmcp import FastMCP
@@ -7,7 +7,6 @@ from utils import _call_ptt_service, _handle_ptt_exception
 
 
 def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
-
     @mcp.tool()
     def get_version() -> Dict[str, Any]:
         """
@@ -17,7 +16,7 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
             Dict[str, Any]: A dictionary containing the version information.
                             Example: {'success': True, 'version': '0.1.0'}
         """
-        return {'success': True, 'version': version}
+        return {"success": True, "version": version}
 
     @mcp.tool()
     def logout() -> Dict[str, Any]:
@@ -33,9 +32,9 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
         ptt_service = memory_storage.get("ptt_bot")
 
         if ptt_service is None:
-            return {'success': False, 'message': '尚未登入，無需登出'}
+            return {"success": False, "message": "尚未登入，無需登出"}
 
-        result = _call_ptt_service(memory_storage, 'logout', success_message='登出成功')
+        result = _call_ptt_service(memory_storage, "logout", success_message="登出成功")
         memory_storage["ptt_bot"] = None
         return result
 
@@ -72,26 +71,37 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
         # 如果已經有一個 bot 實例，先登出舊的
         if memory_storage["ptt_bot"] is not None:
             try:
-                memory_storage["ptt_bot"].call('logout')
+                memory_storage["ptt_bot"].call("logout")
                 memory_storage["ptt_bot"] = None  # 清除 session
             except Exception:
                 pass
 
         ptt_service = PyPtt.Service({})
         try:
-            ptt_service.call('login', {'ptt_id': memory_storage['ptt_id'],
-                                       'ptt_pw': memory_storage['ptt_pw'],
-                                       'kick_other_session': True})
+            ptt_service.call(
+                "login",
+                {
+                    "ptt_id": memory_storage["ptt_id"],
+                    "ptt_pw": memory_storage["ptt_pw"],
+                    "kick_other_session": True,
+                },
+            )
             # 登入成功後，將 bot 實例存起來
             memory_storage["ptt_bot"] = ptt_service
 
-            return {'success': True, 'message': '登入成功'}
+            return {"success": True, "message": "登入成功"}
         except Exception as e:
             memory_storage["ptt_bot"] = None
             return _handle_ptt_exception(e, {})
 
     @mcp.tool()
-    def get_post(board: str, aid: Optional[str] = None, index: int = 0, query: bool = False, search_list: Optional[List[Tuple[str, str]]] = None) -> Dict[str, Any]:
+    def get_post(
+        board: str,
+        aid: Optional[str] = None,
+        index: int = 0,
+        query: bool = False,
+        search_list: Optional[List[Tuple[str, str]]] = None,
+    ) -> Dict[str, Any]:
         """從 PTT 取得指定文章。
 
         必須先登入 PTT。
@@ -125,10 +135,22 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
                             }}
                             失敗時: {'success': False, 'message': '...', 'code': '...'}
         """
-        return _call_ptt_service(memory_storage, "get_post", board=board, aid=aid, index=index, query=query, search_list=search_list)
+        return _call_ptt_service(
+            memory_storage,
+            "get_post",
+            board=board,
+            aid=aid,
+            index=index,
+            query=query,
+            search_list=search_list,
+        )
 
     @mcp.tool()
-    def get_newest_index(index_type: str, board: Optional[str] = None, search_list: Optional[List[Tuple[str, str]]] = None) -> Dict[str, Any]:
+    def get_newest_index(
+        index_type: str,
+        board: Optional[str] = None,
+        search_list: Optional[List[Tuple[str, str]]] = None,
+    ) -> Dict[str, Any]:
         """取得最新文章或信箱編號。
 
         必須先登入 PTT。
@@ -148,10 +170,18 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
                             成功: {'success': True, 'newest_index': 最新編號}
                             失敗: {'success': False, 'message': '...', 'code': '...'}
         """
-        return _call_ptt_service(memory_storage, "get_newest_index", index_type=index_type, board=board, search_list=search_list)
+        return _call_ptt_service(
+            memory_storage,
+            "get_newest_index",
+            index_type=index_type,
+            board=board,
+            search_list=search_list,
+        )
 
     @mcp.tool()
-    def post(board: str, title_index: int, title: str, content: str, sign_file: str = "0") -> Dict[str, Any]:
+    def post(
+        board: str, title_index: int, title: str, content: str, sign_file: str = "0"
+    ) -> Dict[str, Any]:
         """到看板發佈文章。
 
         必須先登入 PTT。
@@ -170,10 +200,26 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
                             成功: {'success': True, 'message': '發文成功'}
                             失敗: {'success': False, 'message': '...', 'code': '...'}
         """
-        return _call_ptt_service(memory_storage, "post", board=board, title_index=title_index, title=title, content=content, sign_file=sign_file, success_message="發文成功")
+        return _call_ptt_service(
+            memory_storage,
+            "post",
+            board=board,
+            title_index=title_index,
+            title=title,
+            content=content,
+            sign_file=sign_file,
+            success_message="發文成功",
+        )
 
     @mcp.tool()
-    def reply_post(board: str, reply_to: str, content: str, aid: Optional[str] = None, index: int = 0, sign_file: str = "0") -> Dict[str, Any]:
+    def reply_post(
+        board: str,
+        reply_to: str,
+        content: str,
+        aid: Optional[str] = None,
+        index: int = 0,
+        sign_file: str = "0",
+    ) -> Dict[str, Any]:
         """到看板回覆文章。
 
         必須先登入 PTT。
@@ -192,10 +238,22 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
                             成功: {'success': True, 'message': '回覆成功'}
                             失敗: {'success': False, 'message': '...', 'code': '...'}
         """
-        return _call_ptt_service(memory_storage, "reply_post", board=board, reply_to=reply_to, content=content, aid=aid, index=index, sign_file=sign_file, success_message="回覆成功")
+        return _call_ptt_service(
+            memory_storage,
+            "reply_post",
+            board=board,
+            reply_to=reply_to,
+            content=content,
+            aid=aid,
+            index=index,
+            sign_file=sign_file,
+            success_message="回覆成功",
+        )
 
     @mcp.tool()
-    def del_post(board: str, aid: Optional[str] = None, index: int = 0) -> Dict[str, Any]:
+    def del_post(
+        board: str, aid: Optional[str] = None, index: int = 0
+    ) -> Dict[str, Any]:
         """刪除文章。
 
         必須先登入 PTT。
@@ -210,10 +268,23 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
                             成功: {'success': True, 'message': '刪除成功'}
                             失敗: {'success': False, 'message': '...', 'code': '...'}
         """
-        return _call_ptt_service(memory_storage, "del_post", board=board, aid=aid, index=index, success_message="刪除成功")
+        return _call_ptt_service(
+            memory_storage,
+            "del_post",
+            board=board,
+            aid=aid,
+            index=index,
+            success_message="刪除成功",
+        )
 
     @mcp.tool()
-    def comment(board: str, comment_type: str, content: str, aid: Optional[str] = None, index: int = 0) -> Dict[str, Any]:
+    def comment(
+        board: str,
+        comment_type: str,
+        content: str,
+        aid: Optional[str] = None,
+        index: int = 0,
+    ) -> Dict[str, Any]:
         """對文章進行推文、噓文或箭頭。
 
         必須先登入 PTT。
@@ -230,10 +301,21 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
                             成功: {'success': True, 'message': '推文成功'}
                             失敗: {'success': False, 'message': '...', 'code': '...'}
         """
-        return _call_ptt_service(memory_storage, "comment", board=board, comment_type=comment_type, content=content, aid=aid, index=index, success_message="推文成功")
+        return _call_ptt_service(
+            memory_storage,
+            "comment",
+            board=board,
+            comment_type=comment_type,
+            content=content,
+            aid=aid,
+            index=index,
+            success_message="推文成功",
+        )
 
     @mcp.tool()
-    def mail(ptt_id: str, title: str, content: str, sign_file: str = "0", backup: bool = True) -> Dict[str, Any]:
+    def mail(
+        ptt_id: str, title: str, content: str, sign_file: str = "0", backup: bool = True
+    ) -> Dict[str, Any]:
         """寄送站內信。
 
         必須先登入 PTT。
@@ -251,10 +333,24 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
                             成功: {'success': True, 'message': '寄信成功'}
                             失敗: {'success': False, 'message': '...', 'code': '...'}
         """
-        return _call_ptt_service(memory_storage, "mail", ptt_id=ptt_id, title=title, content=content, sign_file=sign_file, backup=backup, success_message="寄信成功")
+        return _call_ptt_service(
+            memory_storage,
+            "mail",
+            ptt_id=ptt_id,
+            title=title,
+            content=content,
+            sign_file=sign_file,
+            backup=backup,
+            success_message="寄信成功",
+        )
 
     @mcp.tool()
-    def get_mail(index: int, search_type: Optional[str] = None, search_condition: Optional[str] = None, search_list: Optional[List[List[str]]] = None) -> Dict[str, Any]:
+    def get_mail(
+        index: int,
+        search_type: Optional[str] = None,
+        search_condition: Optional[str] = None,
+        search_list: Optional[List[List[str]]] = None,
+    ) -> Dict[str, Any]:
         """取得信件。
 
         必須先登入 PTT。
@@ -283,7 +379,14 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
                             }}
                             失敗: {'success': False, 'message': '...', 'code': '...'}
         """
-        return _call_ptt_service(memory_storage, "get_mail", index=index, search_type=search_type, search_condition=search_condition, search_list=search_list)
+        return _call_ptt_service(
+            memory_storage,
+            "get_mail",
+            index=index,
+            search_type=search_type,
+            search_condition=search_condition,
+            search_list=search_list,
+        )
 
     @mcp.tool()
     def del_mail(index: int) -> Dict[str, Any]:
@@ -299,10 +402,17 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
                             成功: {'success': True, 'message': '刪除成功'}
                             失敗: {'success': False, 'message': '...', 'code': '...'}
         """
-        return _call_ptt_service(memory_storage, "del_mail", index=index, success_message="刪除成功")
+        return _call_ptt_service(
+            memory_storage, "del_mail", index=index, success_message="刪除成功"
+        )
 
     @mcp.tool()
-    def give_money(ptt_id: str, money: int, red_bag_title: Optional[str] = None, red_bag_content: Optional[str] = None) -> Dict[str, Any]:
+    def give_money(
+        ptt_id: str,
+        money: int,
+        red_bag_title: Optional[str] = None,
+        red_bag_content: Optional[str] = None,
+    ) -> Dict[str, Any]:
         """轉帳 Ptt 幣給指定使用者。
 
         必須先登入 PTT。
@@ -318,7 +428,15 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
                             成功: {'success': True, 'message': '轉帳成功'}
                             失敗: {'success': False, 'message': '...', 'code': '...'}
         """
-        return _call_ptt_service(memory_storage, "give_money", ptt_id=ptt_id, money=money, red_bag_title=red_bag_title, red_bag_content=red_bag_content, success_message="轉帳成功")
+        return _call_ptt_service(
+            memory_storage,
+            "give_money",
+            ptt_id=ptt_id,
+            money=money,
+            red_bag_title=red_bag_title,
+            red_bag_content=red_bag_content,
+            success_message="轉帳成功",
+        )
 
     @mcp.tool()
     def get_user(user_id: str) -> Dict[str, Any]:
@@ -352,7 +470,9 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
         return _call_ptt_service(memory_storage, "get_user", user_id=user_id)
 
     @mcp.tool()
-    def search_user(ptt_id: str, min_page: Optional[int] = None, max_page: Optional[int] = None) -> Dict[str, Any]:
+    def search_user(
+        ptt_id: str, min_page: Optional[int] = None, max_page: Optional[int] = None
+    ) -> Dict[str, Any]:
         """搜尋使用者。
 
         必須先登入 PTT。
@@ -368,7 +488,13 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
                             {'success': True, 'data': ['user1', 'user2', ...]}
                             失敗: {'success': False, 'message': '...', 'code': '...'}
         """
-        return _call_ptt_service(memory_storage, "search_user", ptt_id=ptt_id, min_page=min_page, max_page=max_page)
+        return _call_ptt_service(
+            memory_storage,
+            "search_user",
+            ptt_id=ptt_id,
+            min_page=min_page,
+            max_page=max_page,
+        )
 
     @mcp.tool()
     def change_pw(new_password: str) -> Dict[str, Any]:
@@ -384,7 +510,12 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
                             成功: {'success': True, 'message': '密碼更改成功'}
                             失敗: {'success': False, 'message': '...', 'code': '...'}
         """
-        return _call_ptt_service(memory_storage, "change_pw", new_password=new_password, success_message="密碼更改成功")
+        return _call_ptt_service(
+            memory_storage,
+            "change_pw",
+            new_password=new_password,
+            success_message="密碼更改成功",
+        )
 
     @mcp.tool()
     def get_time() -> Dict[str, Any]:
@@ -471,7 +602,9 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
                             }}
                             失敗: {'success': False, 'message': '...', 'code': '...'}
         """
-        return _call_ptt_service(memory_storage, "get_board_info", board=board, get_post_types=get_post_types)
+        return _call_ptt_service(
+            memory_storage, "get_board_info", board=board, get_post_types=get_post_types
+        )
 
     @mcp.tool()
     def get_aid_from_url(url: str) -> Dict[str, Any]:
@@ -490,9 +623,9 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
         """
         try:
             board_name, aid = PyPtt.API().get_aid_from_url(url)
-            return {'success': True, 'data': [board_name, aid]}
+            return {"success": True, "data": [board_name, aid]}
         except Exception as e:
-            return {'success': False, 'message': f'解析網址失敗: {e}'}
+            return {"success": False, "message": f"解析網址失敗: {e}"}
 
     @mcp.tool()
     def get_bottom_post_list(board: str) -> Dict[str, Any]:
@@ -529,10 +662,18 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
                             成功: {'success': True, 'message': '看板標題設定成功'}
                             失敗: {'success': False, 'message': '...', 'code': '...'}
         """
-        return _call_ptt_service(memory_storage, "set_board_title", board=board, new_title=new_title, success_message="看板標題設定成功")
+        return _call_ptt_service(
+            memory_storage,
+            "set_board_title",
+            board=board,
+            new_title=new_title,
+            success_message="看板標題設定成功",
+        )
 
     @mcp.tool()
-    def bucket(board: str, ptt_id: str, bucket_days: int, reason: str) -> Dict[str, Any]:
+    def bucket(
+        board: str, ptt_id: str, bucket_days: int, reason: str
+    ) -> Dict[str, Any]:
         """將指定使用者水桶。
 
         必須先登入 PTT，且登入帳號需為該看板板主。
@@ -548,4 +689,12 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
                             成功: {'success': True, 'message': '水桶成功'}
                             失敗: {'success': False, 'message': '...', 'code': '...'}
         """
-        return _call_ptt_service(memory_storage, "bucket", board=board, ptt_id=ptt_id, bucket_days=bucket_days, reason=reason, success_message="水桶成功")
+        return _call_ptt_service(
+            memory_storage,
+            "bucket",
+            board=board,
+            ptt_id=ptt_id,
+            bucket_days=bucket_days,
+            reason=reason,
+            success_message="水桶成功",
+        )

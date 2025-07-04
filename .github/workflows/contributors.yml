@@ -1,42 +1,27 @@
 name: Update Contributors
 
 on:
-  pull_request_target:
-    types: [opened, synchronize, reopened]
+  push:
     branches:
       - main
 
 jobs:
   update_contributors:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
-      - name: Checkout PR branch
-        uses: actions/checkout@v3
-        with:
-          repository: ${{ github.event.pull_request.head.repo.full_name }}
-          ref: ${{ github.event.pull_request.head.ref }}
-          fetch-depth: 0
-
       - name: Update contributor list in README
         uses: akhilmhdh/contributors-readme-action@v2.3.10
         with:
           readme_path: README.md
-          commit_message: "docs(readme): update contributors list"
-          use_username: true
-          image_size: 100
-          columns_per_row: 6
-          collaborators: "all"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
 
       - name: Update contributor list in README_ENG
         uses: akhilmhdh/contributors-readme-action@v2.3.10
         with:
           readme_path: README_ENG.md
-          commit_message: "docs(readme): update contributors list"
-          use_username: true
-          image_size: 100
-          columns_per_row: 6
-          collaborators: "all"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}

@@ -1,10 +1,12 @@
+from typing import Dict, Any
+
 import setuptools
 import os
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
-version = {}
+version: Dict[str, Any] = {}
 with open(os.path.join(os.path.dirname(__file__), "src", "_version.py")) as f:
     exec(f.read(), version)
 

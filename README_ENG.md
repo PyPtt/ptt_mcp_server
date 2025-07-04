@@ -182,8 +182,8 @@ Contributions of any kind are welcome! Whether it's reporting an issue or submit
 
 ## 👥 Contributors
 
-<!-- CONTRIBUTORS_LIST -->
-<!-- /CONTRIBUTORS_LIST -->
+<!-- readme: collaborators,contributors -start -->
+<!-- readme: collaborators,contributors -end -->
 
 ## 🙏 Acknowledgements
 

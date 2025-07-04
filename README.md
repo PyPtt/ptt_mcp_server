@@ -182,8 +182,8 @@ pip install ptt-mcp-server
 
 ## 👥 貢獻者 (Contributors)
 
-<!-- CONTRIBUTORS_LIST -->
-<!-- /CONTRIBUTORS_LIST -->
+<!-- readme: collaborators,contributors -start -->
+<!-- readme: collaborators,contributors -end -->
 
 ## 🙏 致謝 (Acknowledgements)
 
