@@ -44,7 +44,7 @@ def get_pypi_version(package_name: str, is_test: bool = True) -> str | None:
             else:
                 print("Max retries reached. Could not fetch PyPI version.")
                 return None
-    return None # Should not be reached
+    return None  # Should not be reached
 
 
 def main():
@@ -67,8 +67,8 @@ def main():
             next_num = str(int(latest_pypi_version.split("dev")[-1]) + 1)
 
             cur_version = latest_pypi_version[
-                : latest_pypi_version.find("dev") + 3
-            ] + str(next_num)
+                          : latest_pypi_version.find("dev") + 3
+                          ] + str(next_num)
     else:
         next_num = str(int(latest_pypi_version.split(".")[-1]) + 1)
 
