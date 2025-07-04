@@ -1,4 +1,4 @@
-[English Version](./README_ENG.md)
+[English Version](https://github.com/PyPtt/ptt_mcp_server/blob/main/README_ENG.md)
 
 <h1 align="center">PTT MCP Server</h1>
 
@@ -15,7 +15,7 @@ The best MCP server for Ptt. Proudly built by <a href="https://pyptt.cc/">PyPtt<
 <a href="https://img.shields.io/pypi/dm/ptt-mcp-server">
 <img src="https://img.shields.io/pypi/dm/ptt-mcp-server" alt="Downloads">
 </a>
-<a href="./LICENSE">
+<a href="https://github.com/PyPtt/ptt_mcp_server/blob/main/LICENSE">
 <img src="https://img.shields.io/badge/license-BSD_3--Clause-blue.svg" alt="License">
 </a>
 </p>
@@ -219,4 +219,4 @@ pip install ptt-mcp-server
 
 ## 📄 授權條款 (License)
 
-本專案採用 [BSD 3-Clause License](./LICENSE) 授權。
+本專案採用 [BSD 3-Clause License](https://github.com/PyPtt/ptt_mcp_server/blob/main/LICENSE) 授權。

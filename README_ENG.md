@@ -1,4 +1,4 @@
-[Traditional Chinese Version](./README.md)
+[Traditional Chinese Version](https://github.com/PyPtt/ptt_mcp_server/blob/main/README.md)
 
 <h1 align="center">PTT MCP Server</h1>
 
@@ -15,7 +15,7 @@ The best MCP server for Ptt. Proudly built by the <a href="https://pyptt.cc/">Py
 <a href="https://img.shields.io/pypi/dm/ptt-mcp-server">
 <img src="https://img.shields.io/pypi/dm/ptt-mcp-server" alt="Downloads">
 </a>
-<a href="./LICENSE">
+<a href="https://github.com/PyPtt/ptt_mcp_server/blob/main/LICENSE">
 <img src="https://img.shields.io/badge/license-BSD_3--Clause-blue.svg" alt="License">
 </a>
 </p>
@@ -219,4 +219,4 @@ Contributions of any kind are welcome! Whether it's reporting an issue or submit
 
 ## 📄 License
 
-This project is licensed under the [BSD 3-Clause License](./LICENSE).
+This project is licensed under the [BSD 3-Clause License](https://github.com/PyPtt/ptt_mcp_server/blob/main//LICENSE).
