@@ -182,8 +182,8 @@ Contributions of any kind are welcome! Whether it's reporting an issue or submit
 
 ## 👥 Contributors
 
-<!-- CONTRIBUTORS_LIST -->
-<!-- /CONTRIBUTORS_LIST -->
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- ALL-CONTRIBUTORS-LIST:END -->
 
 ## 🙏 Acknowledgements
 

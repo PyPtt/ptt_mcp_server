@@ -1,8 +1,8 @@
 [tool.black]
 line-length = 88
 target-version = ['py310']
-include = "(\.pyi|/src/|/scripts/)"
-exclude = "(
+include = '''(\.pyi|/src/|/scripts/)'''
+exclude = '''(
     /\.git/|
     /\.venv/|
     /build/|
@@ -18,7 +18,7 @@ exclude = "(
     \.env/|
     /scripts/test_data/|
     /src/test_data/|
-)"
+)'''
 
 [tool.flake8]
 max-line-length = 88
