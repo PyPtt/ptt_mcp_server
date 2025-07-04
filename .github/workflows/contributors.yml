@@ -1,7 +1,8 @@
 name: Update Contributors
 
 on:
-  push:
+  pull_request:
+    types: [opened, synchronize, reopened]
     branches:
       - main
 
@@ -12,37 +13,27 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Update contributor list
+
+      - name: Update contributor list in README
         uses: akhilmhdh/contributors-readme-action@v2.3.10
         with:
-          repo_name: PyPtt/ptt_mcp_server
-          output_path: README.md
-          commit_message: "docs: update contributors"
+          readme_path: README.md
+          commit_message: "docs(readme): update contributors list"
           use_username: true
-          pull_request: false
-          round_images: true
           image_size: 100
-          columns: 6
-          path_to_overwrite: README.md
+          columns_per_row: 6
           collaborators: "all"
-          after_this: "<!-- CONTRIBUTORS_LIST -->"
-          before_this: "<!-- /CONTRIBUTORS_LIST -->"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Update contributor list for English README
+
+      - name: Update contributor list in README_ENG
         uses: akhilmhdh/contributors-readme-action@v2.3.10
         with:
-          repo_name: PyPtt/ptt_mcp_server
-          output_path: README_ENG.md
-          commit_message: "docs: update contributors"
+          readme_path: README_ENG.md
+          commit_message: "docs(readme): update contributors list"
           use_username: true
-          pull_request: false
-          round_images: true
           image_size: 100
-          columns: 6
-          path_to_overwrite: README_ENG.md
+          columns_per_row: 6
           collaborators: "all"
-          after_this: "<!-- CONTRIBUTORS_LIST -->"
-          before_this: "<!-- /CONTRIBUTORS_LIST -->"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
