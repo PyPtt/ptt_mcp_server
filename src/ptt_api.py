@@ -172,6 +172,9 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
                                                             範例: [("KEYWORD", "PyPtt")], [("AUTHOR", "CodingMan")],
                                                             [("COMMENT", "100")], [("COMMENT", "M")], [("MONEY", "5")]。
 
+                                                            如果有多個關鍵字，應該使用多次搜尋條件，例如想同時搜尋「蔡英文 新聞」，
+                                                            應該使用 [("KEYWORD", "蔡英文"), ("KEYWORD", "新聞")]。
+
         Returns:
             Dict[str, Any]: 一個包含最新編號的字典，或是在失敗時回傳錯誤訊息。
                             成功: {'success': True, 'newest_index': 最新編號}
