@@ -2,3 +2,5 @@ black
 flake8
 mypy
 flake8-pyproject
+types-setuptools
+types-requests

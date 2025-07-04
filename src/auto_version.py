@@ -40,14 +40,16 @@ def main():
 
     latest_pypi_version = get_pypi_version("ptt-mcp-server", is_test=args.test)
 
+    if latest_pypi_version is None:
+        print("Error: Could not retrieve latest PyPI version.")
+        return
+
     # print(latest_version)
 
     if args.test:
-
         if "dev" not in latest_pypi_version:
             cur_version = f"{latest_pypi_version}.dev0"
         else:
-
             next_num = latest_pypi_version.split("dev")[-1]
             next_num = int(next_num) + 1
 
