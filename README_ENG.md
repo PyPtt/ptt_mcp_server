@@ -93,6 +93,10 @@ graph LR
 | **Financial System**   | Check P Coin balance, Transfer P Coins           | ✅     |
 | **Information Query**  | Query user info, Query board info                | ✅     |
 
+## Disclaimer
+
+The PTT MCP server serves solely as an interface for AI to operate the user's PTT account, with the user's authorization. All risks associated with using this MCP server to operate your PTT account are borne by the user. The developers of this project assume no liability or responsibility for any losses or damages incurred from the use of this server.
+
 ## 📋 Requirements
 
 * Python 3.10 or newer.
