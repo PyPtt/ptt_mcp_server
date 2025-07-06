@@ -93,9 +93,19 @@ graph LR
 | **Financial System**   | Check P Coin balance, Transfer P Coins           | ✅     |
 | **Information Query**  | Query user info, Query board info                | ✅     |
 
-## Disclaimer
+## ⚠️ Important Suggestion & Disclaimer
 
-The PTT MCP server serves solely as an interface for AI to operate the user's PTT account, with the user's authorization. All risks associated with using this MCP server to operate your PTT account are borne by the user. The developers of this project assume no liability or responsibility for any losses or damages incurred from the use of this server.
+This project provides powerful PTT automation capabilities, but please note that all actions are based on your authorization, and you are fully responsible for the consequences of all operations. To use this tool safely and effectively, we strongly recommend following these best practices:
+
+**Best Practice: Read Before You Write, Confirm Before You Execute**
+
+Before using any function that modifies PTT content (such as posting, replying, sending mail, pushing comments, etc.), be sure to first use read functions to gather and confirm information.
+
+*   **Example:** Instead of directly ordering to "delete violating posts," first "list all violating posts." After you have reviewed the list and confirmed its accuracy, then execute the deletion.
+
+This simple process can significantly reduce the risk of operational errors (e.g., accidental deletion of posts, sending incorrect content). Although the PTT MCP Server will prompt you for final confirmation before execution, it cannot completely prevent the possibility of incorrect operations. **Please carefully check the content before submitting!**
+
+Please remember that the developers of this project are not responsible for any loss or liability caused by the use of this server.
 
 ## 📋 Requirements
 

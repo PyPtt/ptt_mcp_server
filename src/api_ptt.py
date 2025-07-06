@@ -1,6 +1,6 @@
 from typing import Dict, Any, Optional, List, Tuple
 
-import PyPtt  # type: ignore
+import PyPtt
 from fastmcp import FastMCP
 
 from utils import _call_ptt_service, _handle_ptt_exception
@@ -118,7 +118,6 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
                                                             [("COMMENT", "100")], [("COMMENT", "M")], [("MONEY", "5")]。
             query (bool): 是否為查詢模式。如果是需要文章代碼(AID)、文章網址、文章值多少 Ptt 幣、文章編號(index)，就可以使用查詢模式，速度會快很多。
                           此模式不會包含文章內容。
-
 
         Returns:
             Dict[str, Any]: 一個包含文章資料的字典，或是在失敗時回傳錯誤訊息。

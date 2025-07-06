@@ -20,7 +20,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/PyPtt/ptt_mcp_server",  # 請替換成您的專案 URL
     package_dir={"": "src"},
-    py_modules=["ptt_api", "mcp_server", "utils", "_version"],
+    py_modules=[os.path.splitext(f)[0] for f in os.listdir("src") if f.endswith(".py") and f != "auto_version.py"],
     install_requires=[
         "pyptt",
         "fastmcp",
