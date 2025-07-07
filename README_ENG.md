@@ -1,4 +1,4 @@
-[Traditional Chinese Version](./README.md)
+[Traditional Chinese Version](https://github.com/PyPtt/ptt_mcp_server/blob/main/README.md)
 
 <h1 align="center">PTT MCP Server</h1>
 
@@ -15,7 +15,7 @@ The best MCP server for Ptt. Proudly built by the <a href="https://pyptt.cc/">Py
 <a href="https://img.shields.io/pypi/dm/ptt-mcp-server">
 <img src="https://img.shields.io/pypi/dm/ptt-mcp-server" alt="Downloads">
 </a>
-<a href="./LICENSE">
+<a href="https://github.com/PyPtt/ptt_mcp_server/blob/main/LICENSE">
 <img src="https://img.shields.io/badge/license-BSD_3--Clause-blue.svg" alt="License">
 </a>
 </p>
@@ -91,7 +91,21 @@ graph LR
 | **Post Interaction**   | Push, Boo, Arrow, Reply to post                  | ✅     |
 | **Mail System**        | Read mail, Send new mail, Delete mail            | ✅     |
 | **Financial System**   | Check P Coin balance, Transfer P Coins           | ✅     |
-| **Information Query**  | Query user info, Query board info                | ✅     |
+| **Information Query**  | Query user info, Query board info, **Get post index range** | ✅     |
+
+## ⚠️ Important Suggestion & Disclaimer
+
+This project provides powerful PTT automation capabilities, but please note that all actions are based on your authorization, and you are fully responsible for the consequences of all operations. To use this tool safely and effectively, we strongly recommend following these best practices:
+
+**Best Practice: Read Before You Write, Confirm Before You Execute**
+
+Before using any function that modifies PTT content (such as posting, replying, sending mail, pushing comments, etc.), be sure to first use read functions to gather and confirm information.
+
+*   **Example:** Instead of directly ordering to "delete violating posts," first "list all violating posts." After you have reviewed the list and confirmed its accuracy, then execute the deletion.
+
+This simple process can significantly reduce the risk of operational errors (e.g., accidental deletion of posts, sending incorrect content). Although the PTT MCP Server will prompt you for final confirmation before execution, it cannot completely prevent the possibility of incorrect operations. **Please carefully check the content before submitting!**
+
+Please remember that the developers of this project are not responsible for any loss or liability caused by the use of this server.
 
 ## 📋 Requirements
 
@@ -124,10 +138,7 @@ After installation, the `ptt-mcp-server` command should be available in your she
   "mcpServers": {
     "PTT": {
       "command": "ptt-mcp-server",
-      "env": {
-        "PTT_ID": "YOUR_PTT_ID", // Replace with your PTT ID
-        "PTT_PW": "YOUR_PTT_PW"  // Replace with your PTT password
-      }
+      "env": { /* PTT_ID and PTT_PW should be set as environment variables */ }
     }
   }
 }
@@ -145,10 +156,7 @@ If you use a Python virtual environment, or if the `command` cannot be executed 
       "args": [
         "/path/to/your/venv/bin/ptt-mcp-server"
       ],
-      "env": {
-        "PTT_ID": "YOUR_PTT_ID", // Replace with your PTT ID
-        "PTT_PW": "YOUR_PTT_PW"  // Replace with your PTT password
-      }
+      "env": { /* PTT_ID and PTT_PW should be set as environment variables */ }
     }
   }
 }
@@ -219,4 +227,4 @@ Contributions of any kind are welcome! Whether it's reporting an issue or submit
 
 ## 📄 License
 
-This project is licensed under the [BSD 3-Clause License](./LICENSE).
+This project is licensed under the [BSD 3-Clause License](https://github.com/PyPtt/ptt_mcp_server/blob/main/LICENSE).

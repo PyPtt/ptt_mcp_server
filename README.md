@@ -1,4 +1,4 @@
-[English Version](./README_ENG.md)
+[English Version](https://github.com/PyPtt/ptt_mcp_server/blob/main/README_ENG.md)
 
 <h1 align="center">PTT MCP Server</h1>
 
@@ -15,7 +15,7 @@ The best MCP server for Ptt. Proudly built by <a href="https://pyptt.cc/">PyPtt<
 <a href="https://img.shields.io/pypi/dm/ptt-mcp-server">
 <img src="https://img.shields.io/pypi/dm/ptt-mcp-server" alt="Downloads">
 </a>
-<a href="./LICENSE">
+<a href="https://github.com/PyPtt/ptt_mcp_server/blob/main/LICENSE">
 <img src="https://img.shields.io/badge/license-BSD_3--Clause-blue.svg" alt="License">
 </a>
 </p>
@@ -91,7 +91,21 @@ graph LR
 | **文章互動** | 推文、噓文、給予箭頭、回覆文章          | ✅    |
 | **信箱系統** | 讀取信件、傳送新信件、刪除信件          | ✅    |
 | **金融系統** | 查詢 P幣、轉帳 P幣              | ✅    |
-| **資訊查詢** | 查詢使用者資訊、查詢看板資訊           | ✅    |
+| **資訊查詢** | 查詢使用者資訊、查詢看板資訊、**取得文章索引範圍** | ✅    |
+
+## ⚠️ 重要建議與免責聲明 (Important Suggestion & Disclaimer)
+
+本專案提供強大的 PTT 自動化操作能力，但請注意，所有操作皆基於您的授權，您將對所有操作的後果負全部責任。為了安全且有效地使用本工具，我們強烈建議您遵循以下最佳實踐：
+
+**最佳實踐：先讀後寫，確認再執行**
+
+在使用任何會修改 PTT 內容的功能（如發文、回文、寄信、推文等）之前，請務必先使用讀取功能來收集和確認資訊。
+
+*   **範例：** 與其直接下令「刪除違規文章」，不如先「列出所有違規文章」，在您審核列表確認無誤後，再執行刪除操作。
+
+這個簡單的流程可以大幅降低因自動化操作失誤（例如：誤刪文章、發錯內容）而導致的風險。雖然 PTT MCP Server 已經加入執行前會提示您進行最終確認，但仍無法完全避免誤操作的可能。**請在送出前仔細核對內容！**
+
+請記住，任何因使用本伺服器而造成的損失或責任，本專案開發者概不負責。
 
 ## 📋 環境需求 (Requirements)
 
@@ -219,4 +233,4 @@ pip install ptt-mcp-server
 
 ## 📄 授權條款 (License)
 
-本專案採用 [BSD 3-Clause License](./LICENSE) 授權。
+本專案採用 [BSD 3-Clause License](https://github.com/PyPtt/ptt_mcp_server/blob/main/LICENSE) 授權。
