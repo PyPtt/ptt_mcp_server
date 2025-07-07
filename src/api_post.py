@@ -1,89 +1,189 @@
-
-
-from typing import Dict, Any, Optional, List, Tuple
+from datetime import datetime
+from typing import Dict, Any
 
 import PyPtt
 from fastmcp import FastMCP
 
-from utils import _call_ptt_service, _handle_ptt_exception
+from utils import _call_ptt_service
+
 
 def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
     @mcp.tool()
-    def get_post_index_range() -> Dict[str, Any]:
-
+    def get_board_rules() -> Dict[str, Any]:
         """
-        取得 PTT 文章的索引範圍。
+        取得 PTT 看板規則。
 
-        :return: Dict[str, Any]: 一個包含 prompt 的字典，prompts 欄位將會教導你如何完成目標。
+        註記：此函式必須先登入 PTT。
 
+        Returns:
+            Dict[str, Any]: 包含操作結果的字典。
+                            成功時: {'success': True, 'message': str, 'data': List[str]}
+                            失敗時: {'success': False, 'message': str, 'code': str, 'prompt': str}
         """
 
-        prompt = """這個函式的目標是使用 PTT MCP server 的功能，找到在指定看板（board）和指定日期（target_date）下，所有文章的起始索引（start_index）和結束索引（end_index）。
-
-可用工具函式：
-
-get_newest_index(board: str) -> int：取得看板最新的文章索引。
-
-get_post(board: str, index: int) -> str：取得指定索引文章的日期字串（格式為 "M/DD"，例如 "7/6"）。如果文章不存在或無法取得日期，可能會失敗或回傳空值。你可以使用查詢模式更有效率。
-
-執行計畫
-第 1 步：初始化
-
-設定目標： 假設我們要找 board = "Gossiping" 在 target_date = "7/6" 的文章。
-
-取得搜尋上界： 呼叫 get_newest_index(board="Gossiping") 取得最大索引，稱之為 max_index。
-
-設定搜尋範圍： low = 1, high = max_index。
-
-第 2 步：尋找 start_index (當天的第一篇文章)
-
-目標： 找到第一個日期為 "7/6" 的索引。
-
-方法： 使用二元搜尋法。在迴圈中，你比較 get_post(board="Gossiping", index=mid) 的日期和 target_date。
-
-如果 mid 的日期 早於 "7/6" (例如 "7/5")，表示 start_index 肯定在更右邊。所以更新 low = mid + 1。
-
-如果 mid 的日期 等於或晚於 "7/6" (例如 "7/6" 或 "7/7")，表示 start_index 可能就是 mid，或者在更左邊。所以我們先把 mid 當作可能的答案 (ans = mid)，然後繼續往左邊找看看有沒有更早的，更新 high = mid - 1。
-
-範例流程：
-
-get_post(board="Gossiping", index=100) -> "7/5" => 太早了，往右找 (low 變大)
-
-get_post(board="Gossiping", index=200) -> "7/7" => 太晚了，200 可能是答案，但要往左找 (ans = 200, high = 199)
-
-get_post(board="Gossiping", index=150) -> "7/6" => 150 可能是答案，但要繼續往左找 (ans = 150, high = 149)
-
-結果： 整個迴圈結束後，ans 變數的值就是我們要的 start_index。
-
-第 3 步：尋找 end_index (當天的最後一篇文章)
-
-目標： 找到最後一個日期為 "7/6" 的索引。
-
-方法： 再次使用二元搜尋法（low 和 high 需要重設為 1 和 max_index）。
-
-如果 mid 的日期 晚於 "7/6" (例如 "7/7")，表示 end_index 肯定在更左邊。所以更新 high = mid - 1。
-
-如果 mid 的日期 等於或早於 "7/6" (例如 "7/6" 或 "7/5")，表示 end_index 可能就是 mid，或者在更右邊。所以我們先把 mid 當作可能的答案 (ans = mid)，然後繼續往右邊找看看有沒有更晚的，更新 low = mid + 1。
-
-範例流程：
-
-get_post(board="Gossiping", index=300) -> "7/7" => 太晚了，往左找 (high 變小)
-
-get_post(board="Gossiping", index=250) -> "7/6" => 250 可能是答案，但要繼續往右找 (ans = 250, low = 251)
-
-結果： 整個迴圈結束後，ans 變數的值就是我們要的 end_index。
-
-第 4 步：驗證並回報
-
-在找到 start_index 和 end_index 後，你必須做最後的驗證。呼叫 get_post(board="Gossiping", index=start_index) 和 get_post(board="Gossiping", index=end_index) 確認它們的日期都是 target_date ("7/6")。
-
-如果驗證成功，且 start_index <= end_index，則回報：「在 Gossiping 板，日期 7/6 的文章索引範圍是從 start_index 到 end_index。」
-
-如果找不到，或驗證失敗（例如，找到的 start_index 日期是 "7/7"，代表當天根本沒文章），則回報：「在 Gossiping 板找不到日期 7/6 的任何文章。」"""
+        prompt = """
+        請使用 get_bottom_post_list 來取得置底文章，因為板規通常都會置底。
+        
+        如果找不到版規，請使用 get_newest_index(index_type="BOARD", board=board, search_list=[("KEYWORD", "版規")]) 來取得有版規在標題中的文章列表。
+        
+        註記：版規可能叫做「版規」or 「板規」。
+        """
 
         return {
-            "success": False,
-            "message": f"請遵循 prompt",
-            "code": "FOLLOW_PROMPTS",
-            "prompts": prompt
+            'success': False,
+            'message': '請遵循提示。',
+            'code': 'FOLLOW_PROMPT',
+            'prompt': prompt
         }
+
+    @mcp.tool()
+    def get_post_index_range(board: str, target_date: str) -> Dict[str, Any]:
+        """
+        取得 PTT 文章在指定看板和日期下的索引範圍。
+
+        註記：此函式必須先登入 PTT。
+
+        Args:
+            board (str): 看板名稱，例如 "Gossiping"。
+            target_date (str): 目標日期字串，格式為 "YYYY/MM/DD"，例如 "1987/09/06"。
+
+        Returns:
+            Dict[str, Any]: 包含操作結果的字典。
+                            成功時: {'success': True, 'start_index': int, 'end_index': int}
+                            失敗時: {'success': False, 'message': str}
+        """
+
+        # Helper to parse and compare dates
+        def parse_date_str(date_str: str) -> datetime:
+            # Add a dummy year to make it a full date for comparison.
+            # Assuming all dates are within the current year for simplicity.
+            # For cross-year comparisons, more complex logic would be needed.
+
+            if date_str.count('/') == 2:
+                return datetime.strptime(date_str, "%Y/%m/%d")
+
+            current_year = datetime.now().year
+            return datetime.strptime(f"{current_year}/{date_str}", "%Y/%m/%d")
+
+        try:
+            target_date = parse_date_str(target_date)
+        except ValueError:
+            return {"success": False,
+                    "message": f"Invalid target_date_str format: {target_date}. Expected 'YYYY/MM/DD'."}
+
+        # 1. Get the newest index for the board
+        newest_index_response = _call_ptt_service(
+            memory_storage,
+            "get_newest_index",
+            index_type=PyPtt.NewIndex.BOARD,
+            board=board,
+        )
+        if not newest_index_response.get('success'):
+            return {"success": False,
+                    "message": f"Failed to get newest index for board {board}: {newest_index_response.get('message')}"}
+        max_index = newest_index_response.get('data')
+
+        if max_index is None or max_index < 1:
+            return {"success": False, "message": f"No posts found for board {board}."}
+
+        # Binary search for start_index
+        start_index = -1
+        low, high = 1, max_index
+        while low <= high:
+            mid = (low + high) // 2
+            post_response = _call_ptt_service(
+                memory_storage,
+                "get_post",
+                board=board,
+                index=mid,
+                query=True,
+            )
+
+            if not post_response.get('success') or not post_response.get('data') or not post_response['data'].get(
+                    'list_date'):
+                # If post not found or date missing, try to narrow down the search
+                # This might happen for deleted posts or invalid indices.
+                # For simplicity, we'll assume it's an invalid index and try higher.
+                low = mid + 1
+                continue
+
+            post_date_str = post_response['data']['list_date']
+            try:
+                post_date = parse_date_str(post_date_str)
+            except ValueError:
+                # If post date is malformed, skip and try higher
+                low = mid + 1
+                continue
+
+            if post_date < target_date:
+                low = mid + 1
+            elif post_date == target_date:
+                start_index = mid
+                high = mid - 1  # Try to find an earlier one
+            else:  # post_date > target_date
+                high = mid - 1
+
+        # Binary search for end_index
+        end_index = -1
+        low, high = 1, max_index  # Reset search range
+        while low <= high:
+            mid = (low + high) // 2
+            post_response = _call_ptt_service(
+                memory_storage,
+                "get_post",
+                board=board,
+                index=mid,
+                query=True,
+            )
+
+            if not post_response.get('success') or not post_response.get('data') or not post_response['data'].get(
+                    'list_date'):
+                low = mid + 1
+                continue
+
+            post_date_str = post_response['data']['list_date']
+            try:
+                post_date = parse_date_str(post_date_str)
+            except ValueError:
+                low = mid + 1
+                continue
+
+            if post_date > target_date:
+                high = mid - 1
+            elif post_date == target_date:
+                end_index = mid
+                low = mid + 1  # Try to find a later one
+            else:  # post_date < target_date
+                low = mid + 1
+
+        if start_index == -1 or end_index == -1 or start_index > end_index:
+            return {"success": False, "message": f"在 {board} 板找不到日期 {target_date} 的任何文章。"}
+        else:
+            # Final verification (as suggested in the prompt)
+            # Verify start_index
+            start_post_response = _call_ptt_service(
+                memory_storage,
+                "get_post",
+                board=board,
+                index=start_index,
+                query=True,
+            )
+            if not start_post_response.get('success') or not start_post_response.get('data') or parse_date_str(
+                    start_post_response['data'].get('list_date', '')) != target_date:
+                return {"success": False,
+                        "message": f"在 {board} 板找不到日期 {target_date} 的任何文章 (start_index verification failed)."}
+
+            # Verify end_index
+            end_post_response = _call_ptt_service(
+                memory_storage,
+                "get_post",
+                board=board,
+                index=end_index,
+                query=True,
+            )
+            if not end_post_response.get('success') or not end_post_response.get('data') or parse_date_str(
+                    end_post_response['data'].get('list_date', '')) != target_date:
+                return {"success": False,
+                        "message": f"在 {board} 板找不到日期 {target_date} 的任何文章 (end_index verification failed)."}
+
+            return {"success": True, "start_index": start_index, "end_index": end_index}
