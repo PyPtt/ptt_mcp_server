@@ -1,4 +1,4 @@
 
-black --check .
-flask8 .
-mypy .
+black --check src
+flake8 src
+mypy src

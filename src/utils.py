@@ -1,6 +1,6 @@
 from typing import Dict, Any, Optional
 
-import PyPtt  # type: ignore
+import PyPtt
 
 
 def _handle_ptt_exception(e: Exception, kwargs: Dict[str, Any]) -> Dict[str, Any]:

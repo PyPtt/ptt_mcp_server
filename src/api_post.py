@@ -23,9 +23,9 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
 
         prompt = """
         請使用 get_bottom_post_list 來取得置底文章，因為板規通常都會置底。
-        
+
         如果找不到版規，請使用 get_newest_index(index_type="BOARD", board=board, search_list=[("KEYWORD", "版規")]) 來取得有版規在標題中的文章列表。
-        
+
         註記：版規可能叫做「版規」or 「板規」。
         """
 
