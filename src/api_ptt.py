@@ -96,11 +96,11 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
 
     @mcp.tool()
     def get_post(
-            board: str,
-            aid: Optional[str] = None,
-            index: int = 0,
-            query: bool = False,
-            search_list: Optional[List[Tuple[str, str]]] = None,
+        board: str,
+        aid: Optional[str] = None,
+        index: int = 0,
+        query: bool = False,
+        search_list: Optional[List[Tuple[str, str]]] = None,
     ) -> Dict[str, Any]:
         """從 PTT 取得指定文章。
 
@@ -146,9 +146,9 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
 
     @mcp.tool()
     def get_newest_index(
-            index_type: str,
-            board: Optional[str] = None,
-            search_list: Optional[List[Tuple[str, str]]] = None,
+        index_type: str,
+        board: Optional[str] = None,
+        search_list: Optional[List[Tuple[str, str]]] = None,
     ) -> Dict[str, Any]:
         """取得最新文章或信箱編號。
         函式回傳的 newest_index 代表的是該類型 (看板文章或信箱信件) 的最大有效編號。
@@ -189,7 +189,7 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
 
     @mcp.tool()
     def post(
-            board: str, title_index: int, title: str, content: str, sign_file: str = "0"
+        board: str, title_index: int, title: str, content: str, sign_file: str = "0"
     ) -> Dict[str, Any]:
         """到看板發佈文章。
 
@@ -224,12 +224,12 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
 
     @mcp.tool()
     def reply_post(
-            board: str,
-            reply_to: str,
-            content: str,
-            aid: Optional[str] = None,
-            index: int = 0,
-            sign_file: str = "0",
+        board: str,
+        reply_to: str,
+        content: str,
+        aid: Optional[str] = None,
+        index: int = 0,
+        sign_file: str = "0",
     ) -> Dict[str, Any]:
         """到看板回覆文章。
 
@@ -266,7 +266,7 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
 
     @mcp.tool()
     def del_post(
-            board: str, aid: Optional[str] = None, index: int = 0
+        board: str, aid: Optional[str] = None, index: int = 0
     ) -> Dict[str, Any]:
         """刪除文章。
 
@@ -296,11 +296,11 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
 
     @mcp.tool()
     def comment(
-            board: str,
-            comment_type: str,
-            content: str,
-            aid: Optional[str] = None,
-            index: int = 0,
+        board: str,
+        comment_type: str,
+        content: str,
+        aid: Optional[str] = None,
+        index: int = 0,
     ) -> Dict[str, Any]:
         """對文章進行推文、噓文或箭頭。
 
@@ -334,7 +334,7 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
 
     @mcp.tool()
     def mail(
-            ptt_id: str, title: str, content: str, sign_file: str = "0", backup: bool = True
+        ptt_id: str, title: str, content: str, sign_file: str = "0", backup: bool = True
     ) -> Dict[str, Any]:
         """寄送站內信。
 
@@ -369,10 +369,10 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
 
     @mcp.tool()
     def get_mail(
-            index: int,
-            search_type: Optional[str] = None,
-            search_condition: Optional[str] = None,
-            search_list: Optional[List[List[str]]] = None,
+        index: int,
+        search_type: Optional[str] = None,
+        search_condition: Optional[str] = None,
+        search_list: Optional[List[List[str]]] = None,
     ) -> Dict[str, Any]:
         """取得信件。
 
@@ -434,10 +434,10 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
 
     @mcp.tool()
     def give_money(
-            ptt_id: str,
-            money: int,
-            red_bag_title: Optional[str] = None,
-            red_bag_content: Optional[str] = None,
+        ptt_id: str,
+        money: int,
+        red_bag_title: Optional[str] = None,
+        red_bag_content: Optional[str] = None,
     ) -> Dict[str, Any]:
         """轉帳 Ptt 幣給指定使用者。
 
@@ -500,7 +500,7 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
 
     @mcp.tool()
     def search_user(
-            ptt_id: str, min_page: Optional[int] = None, max_page: Optional[int] = None
+        ptt_id: str, min_page: Optional[int] = None, max_page: Optional[int] = None
     ) -> Dict[str, Any]:
         """搜尋使用者。
 
@@ -707,7 +707,7 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
 
     @mcp.tool()
     def bucket(
-            board: str, ptt_id: str, bucket_days: int, reason: str
+        board: str, ptt_id: str, bucket_days: int, reason: str
     ) -> Dict[str, Any]:
         """將指定使用者水桶。
 

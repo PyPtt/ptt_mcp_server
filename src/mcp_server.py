@@ -16,9 +16,7 @@ PTT_PW = os.getenv("PTT_PW")
 if not PTT_ID or not PTT_PW:
     raise ValueError("PTT_ID and PTT_PW environment variables must be set.")
 
-mcp: FastMCP = FastMCP(
-    f"Ptt MCP Server v{__version__}"
-)
+mcp: FastMCP = FastMCP(f"Ptt MCP Server v{__version__}")
 
 MEMORY_STORAGE: Dict[str, Any] = {"ptt_bot": None, "ptt_id": PTT_ID, "ptt_pw": PTT_PW}
 

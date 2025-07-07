@@ -91,7 +91,7 @@ graph LR
 | **Post Interaction**   | Push, Boo, Arrow, Reply to post                  | ✅     |
 | **Mail System**        | Read mail, Send new mail, Delete mail            | ✅     |
 | **Financial System**   | Check P Coin balance, Transfer P Coins           | ✅     |
-| **Information Query**  | Query user info, Query board info                | ✅     |
+| **Information Query**  | Query user info, Query board info, **Get post index range** | ✅     |
 
 ## ⚠️ Important Suggestion & Disclaimer
 
@@ -138,10 +138,7 @@ After installation, the `ptt-mcp-server` command should be available in your she
   "mcpServers": {
     "PTT": {
       "command": "ptt-mcp-server",
-      "env": {
-        "PTT_ID": "YOUR_PTT_ID", // Replace with your PTT ID
-        "PTT_PW": "YOUR_PTT_PW"  // Replace with your PTT password
-      }
+      "env": { /* PTT_ID and PTT_PW should be set as environment variables */ }
     }
   }
 }
@@ -159,10 +156,7 @@ If you use a Python virtual environment, or if the `command` cannot be executed 
       "args": [
         "/path/to/your/venv/bin/ptt-mcp-server"
       ],
-      "env": {
-        "PTT_ID": "YOUR_PTT_ID", // Replace with your PTT ID
-        "PTT_PW": "YOUR_PTT_PW"  // Replace with your PTT password
-      }
+      "env": { /* PTT_ID and PTT_PW should be set as environment variables */ }
     }
   }
 }
@@ -233,4 +227,4 @@ Contributions of any kind are welcome! Whether it's reporting an issue or submit
 
 ## 📄 License
 
-This project is licensed under the [BSD 3-Clause License](https://github.com/PyPtt/ptt_mcp_server/blob/main//LICENSE).
+This project is licensed under the [BSD 3-Clause License](https://github.com/PyPtt/ptt_mcp_server/blob/main/LICENSE).
