@@ -37,7 +37,7 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
         }
 
     @mcp.tool()
-    def get_post_index_range(board: str, target_date: str) -> Dict[str, Any]:
+    def get_post_index_range(board: str, target_date_str: str) -> Dict[str, Any]:
         """
         取得 PTT 文章在指定看板和日期下的索引範圍。
 
@@ -45,7 +45,7 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
 
         Args:
             board (str): 看板名稱，例如 "Gossiping"。
-            target_date (str): 目標日期字串，格式為 "YYYY/MM/DD"，例如 "1987/09/06"。
+            target_date_str (str): 目標日期字串，格式為 "YYYY/MM/DD"，例如 "1987/09/06"。
 
         Returns:
             Dict[str, Any]: 包含操作結果的字典。
@@ -66,10 +66,10 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
             return datetime.strptime(f"{current_year}/{date_str}", "%Y/%m/%d")
 
         try:
-            target_date = parse_date_str(target_date)
+            target_date = parse_date_str(target_date_str)
         except ValueError:
             return {"success": False,
-                    "message": f"Invalid target_date_str format: {target_date}. Expected 'YYYY/MM/DD'."}
+                    "message": f"Invalid target_date_str format: {target_date_str}. Expected 'YYYY/MM/DD'."}
 
         # 1. Get the newest index for the board
         newest_index_response = _call_ptt_service(
