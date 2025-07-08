@@ -25,10 +25,14 @@ The best MCP server for Ptt. Proudly built by <a href="https://pyptt.cc/">PyPtt<
 
 ## 🚀 快速開始 (Quick Start)
 
-1.  **安裝套件：**
+1.  **安裝套件(使用venv)：**
     ```bash
+    python3 -m venv venv
+    source venv/bin/activate
     pip install ptt-mcp-server
     ```
+
+    * 第二次使用的時候從 `source venv/bin/activate` 就可以了😊
 
 2.  **設定 MCP 客戶端：**
     將以下設定加入您的 MCP 客戶端設定檔，並填入您的 PTT 帳號密碼。
