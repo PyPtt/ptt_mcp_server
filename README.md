@@ -32,6 +32,7 @@ The best MCP server for Ptt. Proudly built by <a href="https://pyptt.cc/">PyPtt<
 
 2.  **設定 MCP 客戶端：**
     將以下設定加入您的 MCP 客戶端設定檔，並填入您的 PTT 帳號密碼。
+    舉例來說，如果是 [gemini-cli](https://github.com/google-gemini/gemini-cli) 的話，你可以把它複製貼上到目前專案資料夾的 `.gemini/settings.json` 檔案內。
 
     ```json
     {
