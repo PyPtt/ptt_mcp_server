@@ -1,0 +1,54 @@
+name: Translate README with Gemini
+
+on:
+  push:
+    branches-ignore:
+      - 'main'
+    paths:
+      - 'README.md'
+
+jobs:
+  translate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Read README.md content
+        id: read_readme
+        run: |
+          content=$(cat README.md)
+          # Escape for JSON and multiline env var
+          content="${content//'%'/'%25'}"
+          content="${content//$'
+'/'\n'}"
+          content="${content//$''/'\r'}"
+          echo "readme_content<<EOF" >> $GITHUB_ENV
+          echo "$content" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Call Gemini API for Translation
+        id: call_gemini
+        uses: google-gemini/gemini-api-action@v1
+        with:
+          api_key: ${{ secrets.GEMINI_API_KEY }}
+          prompt: "Please translate the following Markdown text from Traditional Chinese to English. It is for a GitHub project's README file. Preserve all original Markdown formatting, including code blocks, links, tables, and HTML tags. Do not add any extra commentary, introductions, or explanations outside of the translated text itself. Just return the pure, translated Markdown content. Here is the text:\n\n${{ env.readme_content }}"
+
+      - name: Update README_ENG.md with translation
+        run: |
+          echo "${{ steps.call_gemini.outputs.response }}" > README_ENG.md
+
+      - name: Commit and push if changed
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add README_ENG.md
+          if ! git diff --staged --quiet; then
+            git commit -m "docs: auto-translate README.md to English via Gemini"
+            git push
+          else
+            echo "No changes to commit."
+          fi
