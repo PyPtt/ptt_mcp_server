@@ -6,19 +6,28 @@
 The best MCP server for Ptt. Proudly built by <a href="https://pyptt.cc/">PyPtt</a> developer.
 <br />
 <br />
+
 <a href="https://pypi.org/project/ptt-mcp-server/">
 <img src="https://img.shields.io/pypi/v/ptt-mcp-server.svg" alt="PyPI Version">
 </a>
+
 <a href="https://www.python.org/downloads/">
 <img src="https://img.shields.io/badge/python-3.10%2B-blue.svg" alt="Python 3.10+">
 </a>
+
 <a href="https://img.shields.io/pypi/dm/ptt-mcp-server">
 <img src="https://img.shields.io/pypi/dm/ptt-mcp-server" alt="Downloads">
 </a>
+
+<a href="https://github.com/PyPtt/ptt_mcp_server/actions/workflows/code_quality.yml">
+<img src="https://github.com/PyPtt/ptt_mcp_server/actions/workflows/code_quality.yml/badge.svg" alt="code_quality">
+</a>
+
 <a href="https://github.com/PyPtt/ptt_mcp_server/blob/main/LICENSE">
 <img src="https://img.shields.io/badge/license-BSD_3--Clause-blue.svg" alt="License">
 </a>
 </p>
+
 
 ## 📖 專案介紹 (Description)
 本專案是一個 PTT MCP (Model Context Protocol) 伺服器，它基於功能強大的 [`PyPtt`](https://pyptt.cc/) 函式庫。這使得您的 MCP 客戶端能夠真正登入 PTT 並透過 MCP 協定與 PTT 批踢踢實業坊進行實際互動，並實現自動化操作。
@@ -235,6 +244,8 @@ pip install ptt-mcp-server
 
 * [**PyPtt**](https://pyptt.cc/) - 驅動本專案與 PTT 互動的核心函式庫。
 * [**fastmcp**](https://github.com/jlowin/fastmcp) - 提供高效能 MCP 伺服器框架。
+
+本專案使用的第三方函式庫及其授權條款，請參閱 [`licenses`](https://github.com/PyPtt/ptt_mcp_server/tree/main/licenses) 資料夾。
 
 ## 📄 授權條款 (License)
 
