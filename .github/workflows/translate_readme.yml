@@ -29,7 +29,7 @@ jobs:
         uses: google-gemini/gemini-api-action@v1
         with:
           api_key: ${{ secrets.GEMINI_API_KEY }}
-          prompt: "Please translate the following Markdown text from Traditional Chinese to English. It is for a GitHub project's README file. Preserve all original Markdown formatting, including code blocks, links, tables, and HTML tags. Do not add any extra commentary, introductions, or explanations outside of the translated text itself. Just return the pure, translated Markdown content. Here is the text: ${{ steps.read_file.outputs.content }}"
+          prompt: "Please translate the following Markdown text from Traditional Chinese to English. It is for a GitHub project's README file. Preserve all original Markdown formatting, including code blocks, links, tables, and HTML tags. Do not add any extra commentary, introductions, or explanations outside of the translated text itself. Just return the pure, translated Markdown content. Here is the text:\n\n${{ steps.read_file.outputs.content }}"
 
       - name: Update README_ENG.md with translation
         run: |
