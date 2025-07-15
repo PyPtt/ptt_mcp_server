@@ -1,0 +1,55 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: # 手動觸發
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get package version # 新增步驟：獲取版本號
+        id: get_version
+        run: |
+          # Run auto_version.py to get the current package version
+          # For main branch pushes, we want the release version
+          # For workflow_dispatch, we'll use 'test' tag, so this version is not strictly needed for 'test' tag,
+          # but it's good to have for consistency or future use.
+          PACKAGE_VERSION=$(python src/auto_version.py)
+          echo "PACKAGE_VERSION=$PACKAGE_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Determine image tags # 修改步驟：決定映像檔標籤
+        id: determine_tags
+        run: |
+          IMAGE_TAGS="ghcr.io/PyPtt/ptt_mcp_server:latest" # 預設包含 latest 標籤
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            IMAGE_TAGS="ghcr.io/PyPtt/ptt_mcp_server:test"
+          else
+            # For main branch pushes, add the version tag
+            VERSION_TAG="ghcr.io/PyPtt/ptt_mcp_server:${{ steps.get_version.outputs.PACKAGE_VERSION }}"
+            IMAGE_TAGS="$IMAGE_TAGS,$VERSION_TAG"
+          fi
+          echo "IMAGE_TAGS=$IMAGE_TAGS" >> $GITHUB_OUTPUT
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.determine_tags.outputs.IMAGE_TAGS }}
