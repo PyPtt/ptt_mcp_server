@@ -86,7 +86,7 @@ The best MCP server for Ptt. Proudly built by <a href="https://pyptt.cc/">PyPtt<
 graph LR
     A["MCP 客戶端 (Client)"]
 
-    subgraph B ["PTT MCP 伺服器 (Server)"]
+    subgraph B ["PTT MCP Server"]
         D["PyPtt 函式庫"]
     end
 
