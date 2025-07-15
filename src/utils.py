@@ -14,7 +14,7 @@ def _handle_ptt_exception(e: Exception, kwargs: Dict[str, Any]) -> Dict[str, Any
         ),
         PyPtt.NoPermission: ("沒有權限", "NO_PERMISSION"),
         PyPtt.LoginError: ("登入失敗", "LOGIN_FAILED"),
-        PyPtt.WrongIDorPassword: ("帳號或密碼錯誤", "WRONG_CREDENTIALS"),
+        PyPtt.WrongIDorPassword: ("帳號或密碼錯誤: {}", "WRONG_CREDENTIALS"),
         PyPtt.CantResponse: ("已結案並標記, 不得回應", "CANT_RESPONSE"),
         PyPtt.NoFastComment: ("推文間隔太短", "NO_FAST_COMMENT"),
         PyPtt.NoSuchUser: ("找不到使用者: {ptt_id}", "NO_SUCH_USER"),
@@ -46,12 +46,12 @@ def _handle_ptt_exception(e: Exception, kwargs: Dict[str, Any]) -> Dict[str, Any
 
 
 def _call_ptt_service(
-    session_storage_instance,
-    method_name: str,
-    success_message: Optional[str] = None,
-    empty_data_message: Optional[str] = None,
-    empty_data_code: Optional[str] = None,
-    **kwargs,
+        session_storage_instance,
+        method_name: str,
+        success_message: Optional[str] = None,
+        empty_data_message: Optional[str] = None,
+        empty_data_code: Optional[str] = None,
+        **kwargs,
 ) -> Dict[str, Any]:
     ptt_service = session_storage_instance.get("ptt_bot")
     if ptt_service is None:
