@@ -8,7 +8,9 @@ import api_post
 import api_ptt
 from _version import __version__
 
-load_dotenv(override=True)
+# 只有在非 Docker 環境下才從 .env 載入環境變數
+if not os.getenv("IS_DOCKER_CONTAINER"):
+    load_dotenv(override=True)
 
 PTT_ID = os.getenv("PTT_ID")
 PTT_PW = os.getenv("PTT_PW")
