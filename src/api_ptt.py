@@ -98,7 +98,7 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
     def get_post(
         board: str,
         aid: Optional[str] = None,
-        index: int = 0,
+        index: Optional[int] = None,
         query: bool = False,
         search_list: Optional[List[Tuple[str, str]]] = None,
     ) -> Dict[str, Any]:

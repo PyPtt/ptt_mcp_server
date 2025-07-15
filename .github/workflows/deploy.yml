@@ -1,60 +1,55 @@
-# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+name: Build and Push Docker Image
 
-name: Deploy to PyPi
-
-# run on merge to master or manual trigger
 on:
   push:
-    paths:
-      - 'src/**/*'
-      - 'setup.py'
-      - 'requirements.txt'
     branches:
-      - 'main'
-  workflow_dispatch:
+      - main
+  workflow_dispatch: # 手動觸發
 
 jobs:
-  deploy:
-    name: Deploy to PyPI
+  build-and-push:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
         with:
-          python-version: '3.10'
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install build requests
-      - name: Run TestPyPI auto versioning
-        if: github.event_name == 'workflow_dispatch'
-        run: |
-          next_version=$(python src/auto_version.py --test)
-          echo "__version__ = '$next_version'" > src/_version.py
-          echo "Updated version to $next_version in src/_version.py"
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Run PyPI auto versioning
-        if: github.event_name == 'push'
+      - name: Get package version # 新增步驟：獲取版本號
+        id: get_version
         run: |
-          next_version=$(python src/auto_version.py)
-          echo "__version__ = '$next_version'" > src/_version.py
-          echo "Updated version to $next_version in src/_version.py for official release"
+          # Run auto_version.py to get the current package version
+          # For main branch pushes, we want the release version
+          # For workflow_dispatch, we'll use 'test' tag, so this version is not strictly needed for 'test' tag,
+          # but it's good to have for consistency or future use.
+          PACKAGE_VERSION=$(python src/auto_version.py)
+          echo "PACKAGE_VERSION=$PACKAGE_VERSION" >> $GITHUB_OUTPUT
 
-      - name: Build package
+      - name: Determine image tags # 修改步驟：決定映像檔標籤
+        id: determine_tags
         run: |
-          python -m build
+          IMAGE_TAGS="ghcr.io/pyptt/ptt_mcp_server:latest" # 預設包含 latest 標籤
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            IMAGE_TAGS="ghcr.io/pyptt/ptt_mcp_server:test"
+          else
+            # For main branch pushes, add the version tag
+            VERSION_TAG="ghcr.io/pyptt/ptt_mcp_server:${{ steps.get_version.outputs.PACKAGE_VERSION }}"
+            IMAGE_TAGS="$IMAGE_TAGS,$VERSION_TAG"
+          fi
+          echo "IMAGE_TAGS=$IMAGE_TAGS" >> $GITHUB_OUTPUT
 
-      - name: Publish package to TestPyPI
-        if: github.event_name == 'workflow_dispatch'
-        uses: pypa/gh-action-pypi-publish@release/v1
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
         with:
-          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
-          repository_url: https://test.pypi.org/legacy/
-
-      - name: Publish package to PyPI
-        if: github.event_name == 'push'
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          password: ${{ secrets.PYPI_API_TOKEN }}
+          context: .
+          push: true
+          tags: ${{ steps.determine_tags.outputs.IMAGE_TAGS }}

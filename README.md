@@ -7,18 +7,6 @@ The best MCP server for Ptt. Proudly built by <a href="https://pyptt.cc/">PyPtt<
 <br />
 <br />
 
-<a href="https://pypi.org/project/ptt-mcp-server/">
-<img src="https://img.shields.io/pypi/v/ptt-mcp-server.svg" alt="PyPI Version">
-</a>
-
-<a href="https://www.python.org/downloads/">
-<img src="https://img.shields.io/badge/python-3.10%2B-blue.svg" alt="Python 3.10+">
-</a>
-
-<a href="https://img.shields.io/pypi/dm/ptt-mcp-server">
-<img src="https://img.shields.io/pypi/dm/ptt-mcp-server" alt="Downloads">
-</a>
-
 <a href="https://github.com/PyPtt/ptt_mcp_server/actions/workflows/code_quality.yml">
 <img src="https://github.com/PyPtt/ptt_mcp_server/actions/workflows/code_quality.yml/badge.svg" alt="code_quality">
 </a>
@@ -34,24 +22,27 @@ The best MCP server for Ptt. Proudly built by <a href="https://pyptt.cc/">PyPtt<
 
 ## 🚀 快速開始 (Quick Start)
 
-1.  **安裝套件(使用venv)：**
-    ```bash
-    python3 -m venv venv
-    source venv/bin/activate
-    pip install ptt-mcp-server
-    ```
+使用 Docker 部署 PTT MCP Server 是最推薦的方式，它提供了環境隔離和簡化的設定。
 
-    * 第二次使用的時候從 `source venv/bin/activate` 就可以了😊
+1.  **安裝 Docker**：
+    如果您的系統尚未安裝 Docker，請參考 [Docker 官方文件](https://docs.docker.com/get-docker/) 進行安裝。
 
-2.  **設定 MCP 客戶端：**
-    將以下設定加入您的 MCP 客戶端設定檔，並填入您的 PTT 帳號密碼。
-    舉例來說，如果是 [gemini-cli](https://github.com/google-gemini/gemini-cli) 的話，你可以把它複製貼上到目前專案資料夾的 `.gemini/settings.json` 檔案內。
+2.  **設定 MCP 客戶端**：
+    將以下設定加入您的 MCP 客戶端設定檔 (例如：`~/.gemini/settings.json`)。此配置會讓 MCP 客戶端在需要時自動拉取並運行 Docker 容器。
 
     ```json
     {
       "mcpServers": {
         "PTT": {
-          "command": "ptt-mcp-server",
+          "command": "docker",
+          "args": [
+            "run",
+            "-i",
+            "--rm",
+            "-e", "PTT_ID",
+            "-e", "PTT_PW",
+            "ghcr.io/PyPtt/ptt_mcp_server:latest"
+          ],
           "env": {
             "PTT_ID": "YOUR_PTT_ID", // 請換成您自己的 PTT 帳號
             "PTT_PW": "YOUR_PTT_PW"  // 請換成您自己的 PTT 密碼
@@ -61,7 +52,16 @@ The best MCP server for Ptt. Proudly built by <a href="https://pyptt.cc/">PyPtt<
     }
     ```
 
-3.  **啟動與測試：**
+    **說明：**
+    *   `"command": "docker"`: 指示 MCP 客戶端使用 `docker` 命令來啟動伺服器。
+    *   `"args"`: 包含 `docker run` 命令的參數。
+        *   `-i`: 保持標準輸入 (stdin) 開啟，以便 MCP 伺服器可以接收指令。
+        *   `--rm`: 容器停止後自動刪除，保持系統整潔。
+        *   `-e PTT_ID` 和 `-e PTT_PW`: 告訴 Docker 將 `PTT_ID` 和 `PTT_PW` 環境變數傳遞給容器。
+        *   `ghcr.io/PyPtt/ptt_mcp_server:latest`: 指定要運行的 Docker 映像檔。
+    *   `"env"`: 將 `PTT_ID` 和 `PTT_PW` 直接設定為環境變數。**請務必替換為您自己的 PTT 帳號和密碼。**
+
+3.  **啟動與測試**：
     您的 MCP 客戶端現在應該能自動啟動 PTT MCP 伺服器了。您可以嘗試一個簡單的指令來測試連線，例如要求它登入 PTT。
 
 ## 💡 使用範例 (Usage Example)
@@ -73,7 +73,7 @@ The best MCP server for Ptt. Proudly built by <a href="https://pyptt.cc/">PyPtt<
 
 **MCP 客戶端執行 (背後流程)：**
 1.  Gemini CLI 透過 MCP 協定呼叫 `login` 功能。
-2.  `ptt-mcp-server` 接收到指令，使用 `PyPtt` 函式庫執行登入。
+2.  `ptt-mcp-server` 接收到指令，使用 PyPtt 函式庫執行登入。
 3.  `ptt-mcp-server` 將登入成功或失敗的結果回傳給 Gemini CLI。
 
 **您會看到：**
@@ -86,11 +86,11 @@ The best MCP server for Ptt. Proudly built by <a href="https://pyptt.cc/">PyPtt<
 graph LR
     A["MCP 客戶端 (Client)"]
 
-    subgraph B ["PTT MCP 伺服器 (Server)"]
+    subgraph B ["PTT MCP Server"]
         D["PyPtt 函式庫"]
     end
 
-    C["PTT.cc 網站"]
+    C["PTT"]
 
     A <--> B
     B <--> C
@@ -121,76 +121,10 @@ graph LR
 
 請記住，任何因使用本伺服器而造成的損失或責任，本專案開發者概不負責。
 
-## 📋 環境需求 (Requirements)
-
-* Python 3.10 或更新版本。
-
-## 🚀 安裝與設定 (Installation & Setup)
-
-請遵循以下步驟來安裝並設定您的 MCP 伺服器。
-
-### **步驟一：安裝套件**
-
-開啟您的終端機 (Terminal) 並執行以下指令：
-
-```bash
-pip install ptt-mcp-server
-```
-
-### **步驟二：設定 MCP 客戶端**
-
-您的 MCP 客戶端需要知道如何啟動這個伺服器。以下提供兩種設定方式。
-
-**安全提示**：建議您使用環境變數來設定 PTT 帳號密碼，避免將敏感資訊直接寫在設定檔中。
-
-#### **方法 A：標準路徑設定 (推薦)**
-
-安裝後 ptt-mcp-server 應該就已經在您系統的 Python 環境中，這是最簡單的設定方法。
-
-```json
-{
-  "mcpServers": {
-    "PTT": {
-      "command": "ptt-mcp-server",
-      "env": {
-        "PTT_ID": "YOUR_PTT_ID", // 請換成您自己的 PTT 帳號
-        "PTT_PW": "YOUR_PTT_PW"  // 請換成您自己的 PTT 密碼
-      }
-    }
-  }
-}
-```
-
-#### **方法 B：使用虛擬環境的絕對路徑**
-
-如果您使用 Python 虛擬環境 (Virtual Environment)，或是 command 無法直接執行，您可以提供 Python 直譯器和腳本的絕對路徑。
-
-```json
-{
-  "mcpServers": {
-    "PTT": {
-      "command": "/path/to/your/venv/bin/python3",
-      "args": [
-        "/path/to/your/venv/bin/ptt-mcp-server"
-      ],
-      "env": {
-        "PTT_ID": "YOUR_PTT_ID", // 請換成您自己的 PTT 帳號
-        "PTT_PW": "YOUR_PTT_PW"  // 請換成您自己的 PTT 密碼
-      }
-    }
-  }
-}
-```
-
-**如何找到路徑？**
-
-* **command**: 在您的虛擬環境啟動後，執行 `which python3`。
-* **args**: 在您的虛擬環境啟動後，執行 `which ptt-mcp-server`。
-
 ## 🗺️ 未來藍圖 (Roadmap)
 
 - [ ] 支援更多 PTT 功能 (例如：精華區操作)。
-- [ ] 提供 Docker 映像檔，簡化部署流程。
+- [x] 提供 Docker 映像檔，簡化部署流程。
 - [ ] 撰寫更完整的文件與範例。
 - [ ] 優化效能與連線穩定性。
 
@@ -255,4 +189,4 @@ pip install ptt-mcp-server
 
 ## 📄 授權條款 (License)
 
-本專案採用 [BSD 3-Clause License](https://github.com/PyPtt/ptt_mcp_server/blob/main/LICENSE) 授權。
+本專案採用 [BSD 3-Clause License](https://github.com/PyPtt/ptt_mcp_server/blob/main/LICENSE) 授權.

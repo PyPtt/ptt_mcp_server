@@ -1,80 +1,54 @@
-import argparse
 import time
+from typing import Optional
 
 import requests
 
+import _version
 
-def get_pypi_version(package_name: str, is_test: bool = True) -> str | None:
-    base_url = "https://test.pypi.org/pypi/" if is_test else "https://pypi.org/pypi/"
-    url = f"{base_url}{package_name}/json"
+
+def get_version() -> tuple[Optional[str], Optional[str]]:
+    main_version_url = "https://raw.githubusercontent.com/PyPtt/ptt_mcp_server/refs/heads/main/src/_version.py"
 
     max_retries = 3
     retry_delay_seconds = 2
 
     for attempt in range(max_retries):
         try:
-            response = requests.get(url)
+            response = requests.get(main_version_url)
             response.raise_for_status()  # Raise an exception for HTTP errors
-            data = response.json()
 
-            versions = list(data["releases"].keys())
-            # Sort versions to ensure we get the latest, including pre-releases
-            # This requires a proper version parsing library for robust sorting
-            # For simplicity, we'll assume lexicographical sort works for common cases
-            # A more robust solution would use packaging.version.parse
-            versions.sort(
-                key=lambda s: [int(u) if u.isdigit() else u for u in s.split(".")],
-                reverse=True,
-            )
+            versions = response.text.split('=')[1].strip().strip('"')
 
-            if versions:
-                return versions[0]
-            return None
+            return versions, _version.__version__
+
         except requests.exceptions.RequestException as e:
-            print(f"Attempt {attempt + 1} failed: Error fetching from PyPI API: {e}")
+            print(f"Attempt {attempt + 1} failed: Error fetching: {e}")
             if attempt < max_retries - 1:
                 time.sleep(retry_delay_seconds)
             else:
-                print("Max retries reached. Could not fetch PyPI version.")
-                return None
+                print("Max retries reached. Could not fetch version.")
+                return None, None
         except Exception as e:
             print(f"Attempt {attempt + 1} failed: An unexpected error occurred: {e}")
             if attempt < max_retries - 1:
                 time.sleep(retry_delay_seconds)
             else:
-                print("Max retries reached. Could not fetch PyPI version.")
-                return None
-    return None  # Should not be reached
+                print("Max retries reached. Could not fetch version.")
+                return None, None
+    return None, None  # Should not be reached
 
 
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--test", help="Test Pypi or not", action="store_true")
-    args = parser.parse_args()
+    remote_version, current_version = get_version()
 
-    latest_pypi_version = get_pypi_version("ptt-mcp-server", is_test=args.test)
-
-    if latest_pypi_version is None:
-        print("Error: Could not retrieve latest PyPI version.")
+    if remote_version is None or current_version is None:
+        print("Failed to retrieve version information.")
         return
 
-    # print(latest_version)
-
-    if args.test:
-        if "dev" not in latest_pypi_version:
-            cur_version = f"{latest_pypi_version}.dev0"
-        else:
-            next_num = str(int(latest_pypi_version.split("dev")[-1]) + 1)
-
-            cur_version = latest_pypi_version[
-                : latest_pypi_version.find("dev") + 3
-            ] + str(next_num)
+    if int(remote_version.replace('.', '')) <= int(current_version.replace('.', '')):
+        print(current_version)
     else:
-        next_num = str(int(latest_pypi_version.split(".")[-1]) + 1)
-
-        cur_version = ".".join(latest_pypi_version.split(".")[:2] + [str(next_num)])
-
-    print(cur_version)
+        print(remote_version)
 
 
 if __name__ == "__main__":

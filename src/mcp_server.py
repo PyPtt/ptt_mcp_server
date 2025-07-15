@@ -1,14 +1,11 @@
 import os
 from typing import Dict, Any
 
-from dotenv import load_dotenv
 from fastmcp import FastMCP
 
 import api_post
 import api_ptt
 from _version import __version__
-
-load_dotenv(override=True)
 
 PTT_ID = os.getenv("PTT_ID")
 PTT_PW = os.getenv("PTT_PW")

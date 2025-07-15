@@ -46,12 +46,12 @@ def _handle_ptt_exception(e: Exception, kwargs: Dict[str, Any]) -> Dict[str, Any
 
 
 def _call_ptt_service(
-    session_storage_instance,
-    method_name: str,
-    success_message: Optional[str] = None,
-    empty_data_message: Optional[str] = None,
-    empty_data_code: Optional[str] = None,
-    **kwargs,
+        session_storage_instance,
+        method_name: str,
+        success_message: Optional[str] = None,
+        empty_data_message: Optional[str] = None,
+        empty_data_code: Optional[str] = None,
+        **kwargs,
 ) -> Dict[str, Any]:
     ptt_service = session_storage_instance.get("ptt_bot")
     if ptt_service is None:
