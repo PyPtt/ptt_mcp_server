@@ -24,6 +24,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Get package version # 新增步驟：獲取版本號
         id: get_version
         run: |
@@ -52,4 +58,5 @@ jobs:
         with:
           context: .
           push: true
+          platforms: linux/amd64,linux/arm64 # 指定多平台
           tags: ${{ steps.determine_tags.outputs.IMAGE_TAGS }}

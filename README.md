@@ -41,7 +41,7 @@ The best MCP server for Ptt. Proudly built by <a href="https://pyptt.cc/">PyPtt<
             "--rm",
             "-e", "PTT_ID",
             "-e", "PTT_PW",
-            "ghcr.io/PyPtt/ptt_mcp_server:latest"
+            "ghcr.io/pyptt/ptt_mcp_server:latest"
           ],
           "env": {
             "PTT_ID": "YOUR_PTT_ID", // 請換成您自己的 PTT 帳號
@@ -58,7 +58,7 @@ The best MCP server for Ptt. Proudly built by <a href="https://pyptt.cc/">PyPtt<
         *   `-i`: 保持標準輸入 (stdin) 開啟，以便 MCP 伺服器可以接收指令。
         *   `--rm`: 容器停止後自動刪除，保持系統整潔。
         *   `-e PTT_ID` 和 `-e PTT_PW`: 告訴 Docker 將 `PTT_ID` 和 `PTT_PW` 環境變數傳遞給容器。
-        *   `ghcr.io/PyPtt/ptt_mcp_server:latest`: 指定要運行的 Docker 映像檔。
+        *   `ghcr.io/pyptt/ptt_mcp_server:latest`: 指定要運行的 Docker 映像檔。
     *   `"env"`: 將 `PTT_ID` 和 `PTT_PW` 直接設定為環境變數。**請務必替換為您自己的 PTT 帳號和密碼。**
 
 3.  **啟動與測試**：
