@@ -90,6 +90,9 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
             memory_storage["ptt_bot"] = ptt_service
 
             return {"success": True, "message": "登入成功"}
+        except PyPtt.WrongIDorPassword as e:
+            memory_storage["ptt_bot"] = None
+            return _handle_ptt_exception(e, {"ptt_id": memory_storage["ptt_id"], "ptt_pw": memory_storage["ptt_pw"]})
         except Exception as e:
             memory_storage["ptt_bot"] = None
             return _handle_ptt_exception(e, {})
