@@ -14,7 +14,7 @@ def _handle_ptt_exception(e: Exception, kwargs: Dict[str, Any]) -> Dict[str, Any
         ),
         PyPtt.NoPermission: ("沒有權限", "NO_PERMISSION"),
         PyPtt.LoginError: ("登入失敗", "LOGIN_FAILED"),
-        PyPtt.WrongIDorPassword: ("帳號或密碼錯誤: {}", "WRONG_CREDENTIALS"),
+        PyPtt.WrongIDorPassword: ("帳號或密碼錯誤", "WRONG_CREDENTIALS"),
         PyPtt.CantResponse: ("已結案並標記, 不得回應", "CANT_RESPONSE"),
         PyPtt.NoFastComment: ("推文間隔太短", "NO_FAST_COMMENT"),
         PyPtt.NoSuchUser: ("找不到使用者: {ptt_id}", "NO_SUCH_USER"),

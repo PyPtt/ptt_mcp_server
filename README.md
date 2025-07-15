@@ -73,7 +73,7 @@ The best MCP server for Ptt. Proudly built by <a href="https://pyptt.cc/">PyPtt<
 
 **MCP 客戶端執行 (背後流程)：**
 1.  Gemini CLI 透過 MCP 協定呼叫 `login` 功能。
-2.  `ptt-mcp-server` 接收到指令，使用 `PyPtt` 函式庫執行登入。
+2.  `ptt-mcp-server` 接收到指令，使用 PyPtt 函式庫執行登入。
 3.  `ptt-mcp-server` 將登入成功或失敗的結果回傳給 Gemini CLI。
 
 **您會看到：**
@@ -90,7 +90,7 @@ graph LR
         D["PyPtt 函式庫"]
     end
 
-    C["PTT.cc 網站"]
+    C["PTT"]
 
     A <--> B
     B <--> C
