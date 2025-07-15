@@ -1,11 +1,12 @@
 import time
+from typing import Optional
 
 import requests
 
 import _version
 
 
-def get_version() -> tuple[str, str] | None:
+def get_version() -> tuple[Optional[str], Optional[str]]:
     main_version_url = "https://raw.githubusercontent.com/PyPtt/ptt_mcp_server/refs/heads/main/src/_version.py"
 
     max_retries = 3
@@ -26,19 +27,23 @@ def get_version() -> tuple[str, str] | None:
                 time.sleep(retry_delay_seconds)
             else:
                 print("Max retries reached. Could not fetch version.")
-                return None
+                return None, None
         except Exception as e:
             print(f"Attempt {attempt + 1} failed: An unexpected error occurred: {e}")
             if attempt < max_retries - 1:
                 time.sleep(retry_delay_seconds)
             else:
                 print("Max retries reached. Could not fetch version.")
-                return None
-    return None  # Should not be reached
+                return None, None
+    return None, None  # Should not be reached
 
 
 def main():
     remote_version, current_version = get_version()
+
+    if remote_version is None or current_version is None:
+        print("Failed to retrieve version information.")
+        return
 
     if int(remote_version.replace('.', '')) <= int(current_version.replace('.', '')):
         print(current_version)
