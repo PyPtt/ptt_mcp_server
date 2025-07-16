@@ -1,0 +1,32 @@
+# Git
+.git
+.gitignore
+
+# Python virtual environments
+.venv*
+venv/
+
+# Python caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# IDE and editor specific
+.idea/
+.vscode/
+
+# Test and cache files
+.pytest_cache/
+.mypy_cache/
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Documentation and dev requirements
+docs/
+README.md
+README_ENG.md
+requirements-dev.txt
+run_code_quality.sh
