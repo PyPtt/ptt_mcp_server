@@ -8,7 +8,7 @@ The best MCP server for PTT. Proudly built by <a href="https://pyptt.cc/">PyPtt<
 <br />
 
 <a href="https://github.com/PyPtt/ptt_mcp_server/actions/workflows/code_quality.yml">
-<img src="https://github.com/PyPtt/ptt_mcp_server/actions/workflows/code_quality.yml/badge.svg" alt="code_quality">
+<img src="https://github.com/PyPtt/ptt_mcp_server/actions/workflows/code_quality.yml/badge.svg" alt="Code Quality">
 </a>
 
 <a href="https://github.com/PyPtt/ptt_mcp_server/blob/main/LICENSE">
