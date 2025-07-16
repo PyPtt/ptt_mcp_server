@@ -84,10 +84,10 @@ The best MCP server for Ptt. Proudly built by <a href="https://pyptt.cc/">PyPtt<
 
 ```mermaid
 graph LR
-    A["MCP 客戶端 (Client)"]
+    A["MCP Client"]
 
     subgraph B ["PTT MCP Server"]
-        D["PyPtt 函式庫"]
+        D["PyPtt"]
     end
 
     C["PTT"]

@@ -2,30 +2,32 @@
 
 <h1 align="center">PTT MCP Server</h1>
 
-<p align="center">  
-The best MCP server for PTT. Proudly built by <a href="https://pyptt.cc/">PyPtt</a> developers.  
-<br />  
-<br />  
-<a href="https://github.com/PyPtt/ptt_mcp_server/actions/workflows/code_quality.yml">  
-<img src="https://github.com/PyPtt/ptt_mcp_server/actions/workflows/code_quality.yml/badge.svg" alt="Code Quality">  
-</a>  
-<a href="https://github.com/PyPtt/ptt_mcp_server/blob/main/LICENSE">  
-<img src="https://img.shields.io/badge/license-BSD_3--Clause-blue.svg" alt="License">  
-</a>  
+<p align="center">
+The best MCP server for Ptt. Proudly built by <a href="https://pyptt.cc/">PyPtt</a> developer.
+<br />
+<br />
+
+<a href="https://github.com/PyPtt/ptt_mcp_server/actions/workflows/code_quality.yml">
+<img src="https://github.com/PyPtt/ptt_mcp_server/actions/workflows/code_quality.yml/badge.svg" alt="code_quality">
+</a>
+
+<a href="https://github.com/PyPtt/ptt_mcp_server/blob/main/LICENSE">
+<img src="https://img.shields.io/badge/license-BSD_3--Clause-blue.svg" alt="License">
+</a>
 </p>
 
 ## **📖 Description**
 
-This project is a PTT MCP (Model Context Protocol) server based on the powerful [PyPtt](https://www.google.com/search?q=%5Bhttps://pyptt.cc/%5D(https://pyptt.cc/)) library. It enables your MCP client to genuinely log into PTT, interact with the PTT Bulletin Board System via the MCP protocol, and perform automated operations.
+This is a PTT MCP (Model Context Protocol) server powered by the [`PyPtt`](https://pyptt.cc/) library. It enables any MCP client to authenticate with and interact directly with PTT bulletin board system, allowing for the automation of tasks through the MCP protocol.
 
 ## **🚀 Quick Start**
 
 Using Docker is the most recommended way to deploy the PTT MCP Server, as it provides environment isolation and a simplified setup.
 
 1. Install Docker:  
-   If Docker is not already installed on your system, please refer to the official Docker documentation for installation instructions.  
+   If Docker is not already installed on your system, please refer to the official [Docker](https://docs.docker.com/get-docker/) documentation for installation instructions.  
 2. Configure Your MCP Client:  
-   Add the following configuration to your MCP client's settings file (e.g., ~/.gemini/settings.json). This setup allows the MCP client to automatically pull and run the Docker container when needed.
+   Add the following configuration to your MCP client's settings file (e.g., `~/.gemini/settings.json`). This setup allows the MCP client to automatically pull and run the Docker container when needed.
    ```json
    {  
      "mcpServers": {  
@@ -37,7 +39,7 @@ Using Docker is the most recommended way to deploy the PTT MCP Server, as it pro
            "--rm",  
            "-e", "PTT_ID",  
            "-e", "PTT_PW",  
-           "ghcr.io/PyPtt/ptt_mcp_server:latest"  
+           "ghcr.io/pyptt/ptt_mcp_server:latest"  
          ],  
          "env": {  
            "PTT_ID": "YOUR_PTT_ID", // Please replace with your PTT account ID  
@@ -49,13 +51,13 @@ Using Docker is the most recommended way to deploy the PTT MCP Server, as it pro
    ```
 
    **Explanation:**  
-   * "command": "docker": Instructs the MCP client to use the docker command to start the server.  
-   * "args": Contains the arguments for the docker run command.  
-     * -i: Keeps standard input (stdin) open so the MCP server can receive commands.  
-     * --rm: Automatically removes the container when it stops, keeping your system clean.  
-     * -e PTT_ID and -e PTT_PW: Tells Docker to pass the PTT_ID and PTT_PW environment variables to the container.  
-     * ghcr.io/PyPtt/ptt_mcp_server:latest: Specifies the Docker image to run.  
-   * "env": Sets PTT_ID and PTT_PW directly as environment variables. **Be sure to replace these with your own PTT account ID and password.**  
+   * "command": "docker": Instructs the MCP client to use the `docker` command to start the server.  
+   * "args": Contains the arguments for the `docker run` command.  
+     * `-i`: Keeps standard input (stdin) open so the MCP server can receive commands.  
+     * `--rm`: Automatically removes the container when it stops, keeping your system clean.  
+     * `-e PTT_ID` and `-e PTT_PW`: Tells Docker to pass the `PTT_ID` and `PTT_PW` environment variables to the container.  
+     * `ghcr.io/PyPtt/ptt_mcp_server:latest`: Specifies the Docker image to run.  
+   * `env`: Sets `PTT_ID` and `PTT_PW` directly as environment variables. **Be sure to replace these with your own PTT account ID and password.**  
 3. Launch and Test:  
    Your MCP client should now be able to start the PTT MCP server automatically. You can try a simple command, such as asking it to log into PTT, to test the connection.
 
@@ -79,7 +81,7 @@ Once your MCP client (e.g., Gemini CLI) is configured, you can interact with PTT
 
 ## **⚙️ How it Works**
 
-This project acts as a middle layer. Your MCP client (e.g., Gemini CLI) connects to the locally running ptt-mcp-server. When the server receives a command, it connects to PTT through the [PyPtt](https://www.google.com/search?q=%5Bhttps://pyptt.cc/%5D(https://pyptt.cc/)) library, performs the corresponding action, and sends the result back to your client.
+This project acts as a middle layer. Your MCP client (e.g., Gemini CLI) connects to the ptt-mcp-server running on your local machine. When the server receives a command, it uses the [`PyPtt`](https://pyptt.cc/) library to connect to PTT and execute the corresponding action, finally returning the result to your client.
 
 ```mermaid
 graph LR
