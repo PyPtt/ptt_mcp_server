@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/pyptt-ptt-mcp-server-badge.png)](https://mseep.ai/app/pyptt-ptt-mcp-server)
+
 [English Version](https://github.com/PyPtt/ptt_mcp_server/blob/main/README_ENG.md)
 
 <h1 align="center">PTT MCP Server</h1>
