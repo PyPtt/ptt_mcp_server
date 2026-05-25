@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+  schedule:
+    - cron: '0 16 * * *' # 每天 UTC 16:00 (台北 00:00) 檢查 PyPtt 是否有新版
   workflow_dispatch: # 手動觸發
 
 jobs:
@@ -24,39 +26,63 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+      - name: Get PyPtt latest version from PyPI
+        id: pyptt
+        run: |
+          PYPTT_VERSION=$(curl -fsSL https://pypi.org/pypi/PyPtt/json | python -c "import sys, json; print(json.load(sys.stdin)['info']['version'])")
+          echo "version=$PYPTT_VERSION" >> $GITHUB_OUTPUT
+          echo "Latest PyPtt version on PyPI: $PYPTT_VERSION"
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Get package version # 新增步驟：獲取版本號
+      - name: Get package version
         id: get_version
         run: |
-          # Run auto_version.py to get the current package version
-          # For main branch pushes, we want the release version
-          # For workflow_dispatch, we'll use 'test' tag, so this version is not strictly needed for 'test' tag,
-          # but it's good to have for consistency or future use.
           PACKAGE_VERSION=$(python src/auto_version.py)
           echo "PACKAGE_VERSION=$PACKAGE_VERSION" >> $GITHUB_OUTPUT
 
-      - name: Determine image tags # 修改步驟：決定映像檔標籤
+      - name: Check if image already exists for this PyPtt version
+        id: check_image
+        run: |
+          # 只有 schedule 觸發時才檢查；push / workflow_dispatch 一律重 build
+          if [[ "${{ github.event_name }}" != "schedule" ]]; then
+            echo "skip=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          TAG="pyptt-${{ steps.pyptt.outputs.version }}"
+          if docker manifest inspect "ghcr.io/pyptt/ptt_mcp_server:$TAG" > /dev/null 2>&1; then
+            echo "Image with tag $TAG already exists, skipping build."
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "Image with tag $TAG not found, will build."
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set up QEMU
+        if: steps.check_image.outputs.skip != 'true'
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        if: steps.check_image.outputs.skip != 'true'
+        uses: docker/setup-buildx-action@v3
+
+      - name: Determine image tags
+        if: steps.check_image.outputs.skip != 'true'
         id: determine_tags
         run: |
-          IMAGE_TAGS="ghcr.io/pyptt/ptt_mcp_server:latest" # 預設包含 latest 標籤
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             IMAGE_TAGS="ghcr.io/pyptt/ptt_mcp_server:test"
           else
-            # For main branch pushes, add the version tag
-            VERSION_TAG="ghcr.io/pyptt/ptt_mcp_server:${{ steps.get_version.outputs.PACKAGE_VERSION }}"
-            IMAGE_TAGS="$IMAGE_TAGS,$VERSION_TAG"
+            IMAGE_TAGS="ghcr.io/pyptt/ptt_mcp_server:latest"
+            IMAGE_TAGS="$IMAGE_TAGS,ghcr.io/pyptt/ptt_mcp_server:${{ steps.get_version.outputs.PACKAGE_VERSION }}"
+            IMAGE_TAGS="$IMAGE_TAGS,ghcr.io/pyptt/ptt_mcp_server:pyptt-${{ steps.pyptt.outputs.version }}"
           fi
           echo "IMAGE_TAGS=$IMAGE_TAGS" >> $GITHUB_OUTPUT
 
       - name: Build and push Docker image
+        if: steps.check_image.outputs.skip != 'true'
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          platforms: linux/amd64,linux/arm64 # 指定多平台
+          no-cache: true # 確保抓到最新的 PyPtt
+          platforms: linux/amd64,linux/arm64
           tags: ${{ steps.determine_tags.outputs.IMAGE_TAGS }}
