@@ -38,6 +38,10 @@ def get_version() -> tuple[Optional[str], Optional[str]]:
     return None, None  # Should not be reached
 
 
+def _version_key(version_str: str) -> tuple:
+    return tuple(int(part) for part in version_str.split('.'))
+
+
 def main():
     remote_version, current_version = get_version()
 
@@ -45,7 +49,7 @@ def main():
         print("Failed to retrieve version information.")
         return
 
-    if int(remote_version.replace('.', '')) <= int(current_version.replace('.', '')):
+    if _version_key(remote_version) <= _version_key(current_version):
         print(current_version)
     else:
         print(remote_version)
