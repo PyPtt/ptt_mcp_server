@@ -7,6 +7,22 @@ from fastmcp import FastMCP
 from utils import _call_ptt_service
 
 
+def parse_date_str(date_str: str) -> datetime:
+    # Add a dummy year to make it a full date for comparison.
+    # Assuming all dates are within the current year for simplicity.
+    # For cross-year comparisons, more complex logic would be needed.
+
+    if date_str.count('/') == 2:
+        return datetime.strptime(date_str, "%Y/%m/%d")
+
+    current_year = datetime.now().year
+    return datetime.strptime(f"{current_year}/{date_str}", "%Y/%m/%d")
+
+
+def _md(d: datetime):
+    return (d.month, d.day)
+
+
 def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
     @mcp.tool()
     def get_board_rules() -> Dict[str, Any]:
@@ -53,23 +69,13 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
                             失敗時: {'success': False, 'message': str}
         """
 
-        # Helper to parse and compare dates
-        def parse_date_str(date_str: str) -> datetime:
-            # Add a dummy year to make it a full date for comparison.
-            # Assuming all dates are within the current year for simplicity.
-            # For cross-year comparisons, more complex logic would be needed.
-
-            if date_str.count('/') == 2:
-                return datetime.strptime(date_str, "%Y/%m/%d")
-
-            current_year = datetime.now().year
-            return datetime.strptime(f"{current_year}/{date_str}", "%Y/%m/%d")
-
         try:
             target_date = parse_date_str(target_date_str)
         except ValueError:
             return {"success": False,
                     "message": f"Invalid target_date_str format: {target_date_str}. Expected 'YYYY/MM/DD'."}
+
+        # ponytail: 只比對 month/day（PTT list_date 無年份）。若目標日期區間跨年（12月→1月），binary search 的單調性會被打破、結果可能不對；需要跨年支援時得改用文章 header 的完整日期。
 
         # 1. Get the newest index for the board
         newest_index_response = _call_ptt_service(
@@ -115,9 +121,9 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
                 low = mid + 1
                 continue
 
-            if post_date < target_date:
+            if _md(post_date) < _md(target_date):
                 low = mid + 1
-            elif post_date == target_date:
+            elif _md(post_date) == _md(target_date):
                 start_index = mid
                 high = mid - 1  # Try to find an earlier one
             else:  # post_date > target_date
@@ -148,9 +154,9 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
                 low = mid + 1
                 continue
 
-            if post_date > target_date:
+            if _md(post_date) > _md(target_date):
                 high = mid - 1
-            elif post_date == target_date:
+            elif _md(post_date) == _md(target_date):
                 end_index = mid
                 low = mid + 1  # Try to find a later one
             else:  # post_date < target_date
@@ -168,8 +174,8 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
                 index=start_index,
                 query=True,
             )
-            if not start_post_response.get('success') or not start_post_response.get('data') or parse_date_str(
-                    start_post_response['data'].get('list_date', '')) != target_date:
+            if not start_post_response.get('success') or not start_post_response.get('data') or _md(parse_date_str(
+                    start_post_response['data'].get('list_date', ''))) != _md(target_date):
                 return {"success": False,
                         "message": f"在 {board} 板找不到日期 {target_date} 的任何文章 (start_index verification failed)."}
 
@@ -181,8 +187,8 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
                 index=end_index,
                 query=True,
             )
-            if not end_post_response.get('success') or not end_post_response.get('data') or parse_date_str(
-                    end_post_response['data'].get('list_date', '')) != target_date:
+            if not end_post_response.get('success') or not end_post_response.get('data') or _md(parse_date_str(
+                    end_post_response['data'].get('list_date', ''))) != _md(target_date):
                 return {"success": False,
                         "message": f"在 {board} 板找不到日期 {target_date} 的任何文章 (end_index verification failed)."}
 
