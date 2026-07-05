@@ -6,6 +6,33 @@ from fastmcp import FastMCP
 from utils import _call_ptt_service, _handle_ptt_exception
 
 
+def _perform_login(memory_storage: Dict[str, Any]) -> Dict[str, Any]:
+    # 若已有 bot 實例，先登出舊 session
+    if memory_storage["ptt_bot"] is not None:
+        try:
+            memory_storage["ptt_bot"].call("logout")
+            memory_storage["ptt_bot"] = None
+        except Exception:
+            pass
+
+    ptt_service = PyPtt.Service({})
+    try:
+        ptt_service.call(
+            "login",
+            {
+                "ptt_id": memory_storage["ptt_id"],
+                "ptt_pw": memory_storage["ptt_pw"],
+                "kick_other_session": True,
+            },
+        )
+        # 登入成功後，將 bot 實例存起來
+        memory_storage["ptt_bot"] = ptt_service
+        return {"success": True, "message": "登入成功"}
+    except Exception as e:
+        memory_storage["ptt_bot"] = None
+        return _handle_ptt_exception(e, {})
+
+
 def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
     @mcp.tool()
     def get_version() -> Dict[str, Any]:
@@ -68,31 +95,57 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
                             - 'NEED_MODERATOR_PERMISSION': 需要看板管理員權限。
                             - 'UNKNOWN_ERROR': 操作時發生未知錯誤。
         """
-        # 如果已經有一個 bot 實例，先登出舊的
-        if memory_storage["ptt_bot"] is not None:
-            try:
-                memory_storage["ptt_bot"].call("logout")
-                memory_storage["ptt_bot"] = None  # 清除 session
-            except Exception:
-                pass
+        return _perform_login(memory_storage)
 
-        ptt_service = PyPtt.Service({})
-        try:
-            ptt_service.call(
-                "login",
-                {
-                    "ptt_id": memory_storage["ptt_id"],
-                    "ptt_pw": memory_storage["ptt_pw"],
-                    "kick_other_session": True,
-                },
-            )
-            # 登入成功後，將 bot 實例存起來
-            memory_storage["ptt_bot"] = ptt_service
+    @mcp.tool()
+    def list_accounts() -> Dict[str, Any]:
+        """列出已在環境變數設定的 PTT 帳號名稱（不含密碼），以及目前登入中的帳號名稱。
 
-            return {"success": True, "message": "登入成功"}
-        except Exception as e:
-            memory_storage["ptt_bot"] = None
-            return _handle_ptt_exception(e, {})
+        Returns:
+            Dict[str, Any]: {'success': True,
+                             'accounts': ['default', 'alt', ...],
+                             'current': 'default' 或 None}
+        """
+        return {
+            "success": True,
+            "accounts": list(memory_storage.get("accounts", {}).keys()),
+            "current": memory_storage.get("current_account"),
+        }
+
+    @mcp.tool()
+    def switch_account(name: str) -> Dict[str, Any]:
+        """切換到指定名稱的 PTT 帳號並登入。
+
+        帳號需事先透過環境變數 PTT_ACCOUNTS 設定（見 README）。切換後會記住此帳號，
+        後續 login() 也會使用它。可先用 list_accounts() 查詢可用名稱。
+
+        Args:
+            name (str): 帳號名稱。
+
+        Returns:
+            Dict[str, Any]: 成功 {'success': True,
+                                  'message': "已切換到帳號 'xxx' 並登入成功",
+                                  'current': 'xxx'}
+                            找不到名稱 {'success': False,
+                                        'message': "找不到帳號 'xxx'",
+                                        'available': [...]}
+                            登入失敗則回傳 login 相同的錯誤格式。
+        """
+        accounts = memory_storage.get("accounts", {})
+        if name not in accounts:
+            return {
+                "success": False,
+                "message": f"找不到帳號 '{name}'",
+                "available": list(accounts.keys()),
+            }
+        memory_storage["ptt_id"] = accounts[name]["id"]
+        memory_storage["ptt_pw"] = accounts[name]["pw"]
+        memory_storage["current_account"] = name
+        result = _perform_login(memory_storage)
+        if result.get("success"):
+            result["message"] = f"已切換到帳號 '{name}' 並登入成功"
+            result["current"] = name
+        return result
 
     @mcp.tool()
     def get_post(

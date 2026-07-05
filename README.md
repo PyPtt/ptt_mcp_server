@@ -61,6 +61,15 @@ The best MCP server for Ptt. Proudly built by <a href="https://pyptt.cc/">PyPtt<
         *   `ghcr.io/pyptt/ptt_mcp_server:latest`: 指定要運行的 Docker 映像檔。
     *   `"env"`: 將 `PTT_ID` 和 `PTT_PW` 直接設定為環境變數。**請務必替換為您自己的 PTT 帳號和密碼。**
 
+    **多帳號設定（選用）：**
+    若您有多組 PTT 帳號，可改用環境變數 `PTT_ACCOUNTS`（格式：`名稱=帳號:密碼`，多組以逗號分隔）一次設定多組，之後即可用 `switch_account("名稱")` 切換帳號、`list_accounts()` 查詢可用名稱：
+
+    ```
+    PTT_ACCOUNTS=default=acc1:pw1,alt=acc2:pw2
+    ```
+
+    名稱不可含 `=`、帳號不可含 `:`、密碼不可含 `,`（PTT 帳密實務上不會用到這些字元）。使用 Docker 時，請在 `args` 中同時加上 `"-e", "PTT_ACCOUNTS"`。原本的單一 `PTT_ID`/`PTT_PW` 設定仍然相容，會自動成為名為 `default` 的帳號。
+
 3.  **啟動與測試**：
     您的 MCP 客戶端現在應該能自動啟動 PTT MCP 伺服器了。您可以嘗試一個簡單的指令來測試連線，例如要求它登入 PTT。
 

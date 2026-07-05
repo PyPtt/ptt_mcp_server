@@ -58,6 +58,15 @@ Using Docker is the most recommended way to deploy the PTT MCP Server, as it pro
      * `-e PTT_ID` and `-e PTT_PW`: Tells Docker to pass the `PTT_ID` and `PTT_PW` environment variables to the container.  
      * `ghcr.io/PyPtt/ptt_mcp_server:latest`: Specifies the Docker image to run.  
    * `env`: Sets `PTT_ID` and `PTT_PW` directly as environment variables. **Be sure to replace these with your own PTT account ID and password.**  
+
+   **Multiple accounts (optional):**  
+   If you have more than one PTT account, you can configure them all at once with the `PTT_ACCOUNTS` environment variable (format: `name=id:password`, comma-separated), then switch between them with `switch_account("name")` and list the available names with `list_accounts()`:
+
+   ```
+   PTT_ACCOUNTS=default=acc1:pw1,alt=acc2:pw2
+   ```
+
+   Names must not contain `=`, IDs must not contain `:`, and passwords must not contain `,` (PTT credentials never use these characters in practice). When using Docker, also add `"-e", "PTT_ACCOUNTS"` to `args`. The single `PTT_ID`/`PTT_PW` setup remains supported and becomes an account named `default`.
 3. Launch and Test:  
    Your MCP client should now be able to start the PTT MCP server automatically. You can try a simple command, such as asking it to log into PTT, to test the connection.
 
