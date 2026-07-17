@@ -148,6 +148,28 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
         return result
 
     @mcp.tool()
+    def whoami() -> Dict[str, Any]:
+        """回傳目前登入中的 PTT 帳號資訊，實際登入狀態直接向 PyPtt 查詢。
+
+        Returns:
+            Dict[str, Any]: {'success': True,
+                             'account': 'default',   # 帳號名稱（來自 PTT_ACCOUNTS 標籤）
+                             'ptt_id': 'CodingMan',  # PyPtt 目前登入的實際 PTT ID；未登入為 None
+                             'logged_in': True}      # PyPtt 回報是否已登入
+        """
+        # ponytail: 讀 PyPtt 私有屬性取真實狀態；PyPtt 無公開存取方法，改版壞了再換
+        api = getattr(memory_storage.get("ptt_bot"), "_api", None)
+        logged_in = bool(getattr(api, "_is_login", False))
+        # PyPtt 登出不清 ptt_id，未登入時不回報殘留值
+        ptt_id = (getattr(api, "ptt_id", "") or None) if logged_in else None
+        return {
+            "success": True,
+            "account": memory_storage.get("current_account"),
+            "ptt_id": ptt_id,
+            "logged_in": logged_in,
+        }
+
+    @mcp.tool()
     def get_post(
         board: str,
         aid: Optional[str] = None,
