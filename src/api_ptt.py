@@ -1,3 +1,4 @@
+import threading
 from typing import Dict, Any, Optional, List, Tuple
 
 import PyPtt
@@ -5,32 +6,74 @@ from fastmcp import FastMCP
 
 from utils import _call_ptt_service, _handle_ptt_exception
 
+# ponytail: module-level 鎖序列化池變動，防 FastMCP 併發呼叫造成 double-login/race。
+_pool_lock = threading.Lock()
 
-def _perform_login(memory_storage: Dict[str, Any]) -> Dict[str, Any]:
-    # 若已有 bot 實例，先登出舊 session
-    if memory_storage["ptt_bot"] is not None:
-        try:
-            memory_storage["ptt_bot"].call("logout")
-            memory_storage["ptt_bot"] = None
-        except Exception:
-            pass
 
+def _login_new_service(
+    ptt_id: str, ptt_pw: str
+) -> Tuple[Optional[Any], Dict[str, Any]]:
+    """建一個新 Service 並登入。成功回 (svc, 成功dict)；失敗先 close() 掉失敗的 svc
+    再回 (None, 錯誤dict)。此 helper 不碰 active session 或池。"""
     ptt_service = PyPtt.Service({})
     try:
         ptt_service.call(
             "login",
             {
-                "ptt_id": memory_storage["ptt_id"],
-                "ptt_pw": memory_storage["ptt_pw"],
+                "ptt_id": ptt_id,
+                "ptt_pw": ptt_pw,
                 "kick_other_session": True,
             },
         )
-        # 登入成功後，將 bot 實例存起來
-        memory_storage["ptt_bot"] = ptt_service
-        return {"success": True, "message": "登入成功"}
+        return ptt_service, {"success": True, "message": "登入成功"}
     except Exception as e:
-        memory_storage["ptt_bot"] = None
-        return _handle_ptt_exception(e, {})
+        # 洩漏防護：登入失敗的 Service 內有 daemon thread + 連線，離開前必須 close。
+        try:
+            ptt_service.close()
+        except Exception:
+            pass
+        return None, _handle_ptt_exception(e, {})
+
+
+def _is_alive(svc: Any) -> bool:
+    """驗活：對池裡的 Service 做一個便宜的 authenticated 呼叫探測，丟例外即視為 dead。"""
+    # ponytail: PTT 會斷閒置連線，光看 _is_login flag 偵測不到 server 端斷線，故主動用 get_time 探測。
+    try:
+        svc.call("get_time")
+        return True
+    except Exception:
+        return False
+
+
+def _activate(memory_storage: Dict[str, Any], name: str) -> Dict[str, Any]:
+    """把帳號 name 設為 active（登入並放進池）。原子性：新登入失敗不動 active session。"""
+    accounts = memory_storage["accounts"]
+    with _pool_lock:
+        pool = memory_storage["pool"]
+        svc = pool.get(name)
+
+        # 池裡有但已死 → close 汰換（離開池的 Service 都要 close 防洩漏）。
+        if svc is not None and not _is_alive(svc):
+            try:
+                svc.close()
+            except Exception:
+                pass
+            pool.pop(name, None)
+            svc = None
+
+        if svc is None:
+            svc, result = _login_new_service(accounts[name]["id"], accounts[name]["pw"])
+            if svc is None:
+                # 原子性關鍵：登入失敗，不動 ptt_bot / current_account / ptt_id / ptt_pw。
+                return result
+            pool[name] = svc
+
+        memory_storage["ptt_bot"] = svc
+        memory_storage["current_account"] = name
+        # 同步憑證，讓 bare login() 等仍與 active 帳號一致。
+        memory_storage["ptt_id"] = accounts[name]["id"]
+        memory_storage["ptt_pw"] = accounts[name]["pw"]
+        return {"success": True, "message": "登入成功"}
 
 
 def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
@@ -61,8 +104,20 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
         if ptt_service is None:
             return {"success": False, "message": "尚未登入，無需登出"}
 
-        result = _call_ptt_service(memory_storage, "logout", success_message="登出成功")
-        memory_storage["ptt_bot"] = None
+        # 只登出 active 帳號：logout 後 close、從池移除、ptt_bot=None；其他池內帳號不動。
+        with _pool_lock:
+            result = _call_ptt_service(
+                memory_storage, "logout", success_message="登出成功"
+            )
+            try:
+                ptt_service.close()
+            except Exception:
+                pass
+            pool = memory_storage["pool"]
+            for pool_name, pool_svc in list(pool.items()):
+                if pool_svc is ptt_service:
+                    del pool[pool_name]
+            memory_storage["ptt_bot"] = None
         return result
 
     @mcp.tool()
@@ -95,7 +150,7 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
                             - 'NEED_MODERATOR_PERMISSION': 需要看板管理員權限。
                             - 'UNKNOWN_ERROR': 操作時發生未知錯誤。
         """
-        return _perform_login(memory_storage)
+        return _activate(memory_storage, memory_storage["current_account"])
 
     @mcp.tool()
     def list_accounts() -> Dict[str, Any]:
@@ -106,10 +161,17 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
                              'accounts': ['default', 'alt', ...],
                              'current': 'default' 或 None}
         """
+        # ponytail: 用 whoami 那套真實狀態判定（讀 PyPtt 私有 _is_login），沒 active 登入才不謊報。
+        api = getattr(memory_storage.get("ptt_bot"), "_api", None)
+        current = (
+            memory_storage.get("current_account")
+            if getattr(api, "_is_login", False)
+            else None
+        )
         return {
             "success": True,
             "accounts": list(memory_storage.get("accounts", {}).keys()),
-            "current": memory_storage.get("current_account"),
+            "current": current,
         }
 
     @mcp.tool()
@@ -138,10 +200,7 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
                 "message": f"找不到帳號 '{name}'",
                 "available": list(accounts.keys()),
             }
-        memory_storage["ptt_id"] = accounts[name]["id"]
-        memory_storage["ptt_pw"] = accounts[name]["pw"]
-        memory_storage["current_account"] = name
-        result = _perform_login(memory_storage)
+        result = _activate(memory_storage, name)
         if result.get("success"):
             result["message"] = f"已切換到帳號 '{name}' 並登入成功"
             result["current"] = name

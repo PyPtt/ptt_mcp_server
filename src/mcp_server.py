@@ -1,3 +1,4 @@
+import atexit
 import os
 from typing import Dict, Any
 
@@ -54,6 +55,7 @@ mcp: FastMCP = FastMCP(f"Ptt MCP Server v{__version__}")
 
 MEMORY_STORAGE: Dict[str, Any] = {
     "ptt_bot": None,
+    "pool": {},
     "ptt_id": accounts[initial]["id"],
     "ptt_pw": accounts[initial]["pw"],
     "accounts": accounts,
@@ -61,10 +63,20 @@ MEMORY_STORAGE: Dict[str, Any] = {
 }
 
 
+def _close_pool() -> None:
+    # 關站時關掉池內所有 Service（各有 daemon thread + 連線），避免洩漏。
+    for svc in MEMORY_STORAGE["pool"].values():
+        try:
+            svc.close()
+        except Exception:
+            pass
+
+
 def main():
     api_ptt.register_tools(mcp, MEMORY_STORAGE, __version__)
     api_post.register_tools(mcp, MEMORY_STORAGE, __version__)
 
+    atexit.register(_close_pool)
     mcp.run()
 
 
