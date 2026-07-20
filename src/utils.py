@@ -37,6 +37,10 @@ def _handle_ptt_exception(e: Exception, kwargs: Dict[str, Any]) -> Dict[str, Any
                 else message_format
             )
             return {"success": False, "message": message, "code": code}
+    if isinstance(e, PyPtt.ParameterError):
+        # PyPtt 對參數問題（如 bad_post_type=OTHER 卻沒給 reason、reason 超長）丟
+        # ParameterError，訊息本身就講清楚了；給它專屬 code，別誤標成 UNKNOWN_ERROR。
+        return {"success": False, "message": f"參數錯誤: {e}", "code": "PARAMETER_ERROR"}
     return {
         "success": False,
         "message": f"操作時發生未知錯誤: {e}",
