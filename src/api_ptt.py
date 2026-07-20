@@ -10,6 +10,20 @@ from utils import _call_ptt_service, _handle_ptt_exception
 _pool_lock = threading.Lock()
 
 
+def _bad_post_type_from_name(name: Optional[str]) -> Optional["PyPtt.BadPostType"]:
+    """劣退／惡退分類的字串名 → PyPtt.BadPostType。
+
+    BadPostType 是 IntEnum（不像 SearchType 是 str 子類），MCP 收到的字串不能
+    直接傳給 PyPtt，得先用成員名查回 enum。未知名稱丟 ValueError 由呼叫端轉錯誤。
+    """
+    if name is None:
+        return None
+    try:
+        return PyPtt.BadPostType[name]
+    except KeyError:
+        raise ValueError(name)
+
+
 def _login_new_service(
     ptt_id: str, ptt_pw: str
 ) -> Tuple[Optional[Any], Dict[str, Any]]:
@@ -400,7 +414,11 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
 
     @mcp.tool()
     def del_post(
-        board: str, aid: Optional[str] = None, index: int = 0
+        board: str,
+        aid: Optional[str] = None,
+        index: int = 0,
+        bad_post_type: Optional[str] = None,
+        bad_post_reason: Optional[str] = None,
     ) -> Dict[str, Any]:
         """刪除文章。
 
@@ -409,22 +427,48 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
 
         註記：此函式必須先登入 PTT。
 
+        劣退／惡退（劣文退文，PTT 選單上顯示為「惡退」，兩種說法都是同一件事）：
+        板主刪除「他人」文章時，可對作者記一支退文（badpost）。
+        只有板主刪他人文章時才適用；刪自己的文章請勿傳 bad_post_type。
+
         Args:
             board (str): 文章所在的看板名稱。
             aid (str, optional): 文章的 ID (AID)。與 `index` 擇一使用。
             index (int, optional): 文章的索引，從 1 開始。與 `aid` 擇一使用。
+            bad_post_type (str, optional): 劣退／惡退分類，四選一：
+                                           "AD"（廣告）、"BAD_LANGUAGE"（不當用辭）、
+                                           "PERSONAL_ATTACK"（人身攻擊）、"OTHER"（其他）。
+                                           不傳＝不記劣退／惡退，只單純刪文。
+            bad_post_reason (str, optional): 劣退／惡退理由。僅當 bad_post_type 為 "OTHER" 時
+                                             必須傳入，且不可超過 50 bytes（Big5 編碼）；
+                                             其餘分類請勿傳入。
 
         Returns:
             Dict[str, Any]: 一個包含操作結果的字典。
                             成功: {'success': True, 'message': '刪除成功'}
                             失敗: {'success': False, 'message': '...', 'code': '...'}
+                            bad_post_type 無效: {'success': False, 'message': '...',
+                                                 'code': 'BAD_PARAM'}
         """
+        try:
+            bpt = _bad_post_type_from_name(bad_post_type)
+        except ValueError:
+            return {
+                "success": False,
+                "message": (
+                    f"未知的 bad_post_type: {bad_post_type!r}，"
+                    "可用: AD, BAD_LANGUAGE, PERSONAL_ATTACK, OTHER"
+                ),
+                "code": "BAD_PARAM",
+            }
         return _call_ptt_service(
             memory_storage,
             "del_post",
             board=board,
             aid=aid,
             index=index,
+            bad_post_type=bpt,
+            bad_post_reason=bad_post_reason,
             success_message="刪除成功",
         )
 
