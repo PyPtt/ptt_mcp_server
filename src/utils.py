@@ -29,6 +29,20 @@ def _handle_ptt_exception(e: Exception, kwargs: Dict[str, Any]) -> Dict[str, Any
         ),
     }
 
+    # TwoFactorAuthRequired 繼承 LoginError，若放進上面的 dict 迴圈會被
+    # LoginError 先攔截、蓋成泛用的「登入失敗」。獨立分支、放在迴圈之前，
+    # 保留 PyPtt 的原始訊息（含如何完成 2FA 驗證的指引）。getattr 是為了
+    # 相容裝了舊版 PyPtt（<2.3.6，還沒有這個例外類別）的環境。
+    two_factor_auth_required = getattr(PyPtt, "TwoFactorAuthRequired", None)
+    if two_factor_auth_required is not None and isinstance(
+        e, two_factor_auth_required
+    ):
+        return {
+            "success": False,
+            "message": str(e),
+            "code": "TWO_FACTOR_AUTH_REQUIRED",
+        }
+
     for exc_type, (message_format, code) in EXCEPTION_MAPPING.items():
         if isinstance(e, exc_type):
             message = (
