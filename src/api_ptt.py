@@ -152,6 +152,7 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
                             - 'NO_SUCH_POST': 在看板中找不到文章 AID 或 Index。
                             - 'NO_PERMISSION': 沒有權限。
                             - 'LOGIN_FAILED': 登入失敗。
+                            - 'TWO_FACTOR_AUTH_REQUIRED': 需要二階段驗證，請先用一般 BBS 客戶端從這台機器手動登入完成驗證。
                             - 'WRONG_CREDENTIALS': 帳號或密碼錯誤。
                             - 'CANT_RESPONSE': 已結案並標記, 不得回應。
                             - 'NO_FAST_COMMENT': 推文間隔太短。
