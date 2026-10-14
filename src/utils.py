@@ -69,8 +69,15 @@ def _call_ptt_service(
         success_message: Optional[str] = None,
         empty_data_message: Optional[str] = None,
         empty_data_code: Optional[str] = None,
+        ensure_alive: bool = True,
         **kwargs,
 ) -> Dict[str, Any]:
+    if ensure_alive:
+        hook = session_storage_instance.get("ensure_alive")
+        error = hook() if hook is not None else None
+        if error is not None:
+            return error
+
     ptt_service = session_storage_instance.get("ptt_bot")
     if ptt_service is None:
         return {

@@ -1,4 +1,5 @@
 import threading
+import time
 from typing import Dict, Any, Optional, List, Tuple
 
 import PyPtt
@@ -8,6 +9,14 @@ from utils import _call_ptt_service, _handle_ptt_exception
 
 # ponytail: module-level 鎖序列化池變動，防 FastMCP 併發呼叫造成 double-login/race。
 _pool_lock = threading.Lock()
+
+# 同一帳號兩次登入嘗試的最小間隔（秒）。PTT 會擋太頻繁的登入，失敗的嘗試也算。
+LOGIN_MIN_INTERVAL = 60
+# 距離上次呼叫超過這麼久，下次呼叫前先探測連線，斷了就自動重登。
+IDLE_PROBE_SECONDS = 60
+
+# 時鐘抽出來，方便測試快轉時間。
+_clock = time.monotonic
 
 
 def _bad_post_type_from_name(name: Optional[str]) -> Optional["PyPtt.BadPostType"]:
@@ -76,6 +85,18 @@ def _activate(memory_storage: Dict[str, Any], name: str) -> Dict[str, Any]:
             svc = None
 
         if svc is None:
+            last_login_at = memory_storage.setdefault("last_login_at", {})
+            now = _clock()
+            last = last_login_at.get(name)
+            if last is not None and now - last < LOGIN_MIN_INTERVAL:
+                retry_after = int(LOGIN_MIN_INTERVAL - (now - last)) + 1
+                return {
+                    "success": False,
+                    "message": f"登入太頻繁，請 {retry_after} 秒後再試",
+                    "code": "LOGIN_THROTTLED",
+                    "retry_after": retry_after,
+                }
+            last_login_at[name] = now
             svc, result = _login_new_service(accounts[name]["id"], accounts[name]["pw"])
             if svc is None:
                 # 原子性關鍵：登入失敗，不動 ptt_bot / current_account / ptt_id / ptt_pw。
@@ -87,10 +108,33 @@ def _activate(memory_storage: Dict[str, Any], name: str) -> Dict[str, Any]:
         # 同步憑證，讓 bare login() 等仍與 active 帳號一致。
         memory_storage["ptt_id"] = accounts[name]["id"]
         memory_storage["ptt_pw"] = accounts[name]["pw"]
+        memory_storage["last_used_at"] = _clock()
         return {"success": True, "message": "登入成功"}
 
 
+def _ensure_alive(memory_storage: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """閒置一段時間後，在下次呼叫前先探測連線，斷了就自動重登。
+
+    回 None 代表可以繼續呼叫；回 dict 代表重登失敗（含 LOGIN_THROTTLED），呼叫端直接回傳它。
+    """
+    # ponytail: 先探測再呼叫，而非失敗後重試：發文、推文、轉帳等寫入操作重試可能重複送出。
+    if memory_storage.get("ptt_bot") is None:
+        # 從未登入或已主動登出，不自動登入。
+        return None
+    now = _clock()
+    last_used_at = memory_storage.get("last_used_at")
+    if last_used_at is not None and now - last_used_at < IDLE_PROBE_SECONDS:
+        memory_storage["last_used_at"] = now
+        return None
+    # _activate 會用 get_time 探測：活著就沿用，死了才重登（受 LOGIN_MIN_INTERVAL 限制）。
+    result = _activate(memory_storage, memory_storage["current_account"])
+    return None if result.get("success") else result
+
+
 def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
+    # 讓 utils._call_ptt_service 在每次呼叫前做閒置探測；放在 storage 裡避免 utils ↔ api_ptt 循環 import。
+    memory_storage["ensure_alive"] = lambda: _ensure_alive(memory_storage)
+
     @mcp.tool()
     def get_version() -> Dict[str, Any]:
         """
@@ -107,6 +151,8 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
         """Logs out from the PTT service.
 
         This function terminates the current PTT session if one is active.
+        不需要在每次任務完成後登出：閒置斷線時 server 會在下次呼叫前自動重新登入，
+        頻繁登出再登入反而容易被 PTT 擋下。只有在使用者明確要求時才呼叫。
 
         Returns:
             Dict[str, Any]: A dictionary indicating the result of the logout attempt.
@@ -120,8 +166,12 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
 
         # 只登出 active 帳號：logout 後 close、從池移除、ptt_bot=None；其他池內帳號不動。
         with _pool_lock:
+            # 已持有 _pool_lock，不能再走閒置探測（_activate 會再拿鎖而死結）。
             result = _call_ptt_service(
-                memory_storage, "logout", success_message="登出成功"
+                memory_storage,
+                "logout",
+                success_message="登出成功",
+                ensure_alive=False,
             )
             try:
                 ptt_service.close()
@@ -140,6 +190,8 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
 
         This function initializes a connection to PTT and attempts to log in.
         The login status is maintained on the server for subsequent calls.
+        若已登入且連線正常，不會重複登入。閒置斷線時 server 會在下次呼叫前自動重新登入，
+        不需要反覆呼叫 login。同一帳號 60 秒內只允許一次登入嘗試。
 
         Returns:
             Dict[str, Any]: A dictionary containing the result of the login attempt.
@@ -153,6 +205,7 @@ def register_tools(mcp: FastMCP, memory_storage: Dict[str, Any], version: str):
                             - 'NO_PERMISSION': 沒有權限。
                             - 'LOGIN_FAILED': 登入失敗。
                             - 'TWO_FACTOR_AUTH_REQUIRED': 需要二階段驗證，請先用一般 BBS 客戶端從這台機器手動登入完成驗證。
+                            - 'LOGIN_THROTTLED': 登入太頻繁，請依回傳的 'retry_after' 秒數等待後再試。
                             - 'WRONG_CREDENTIALS': 帳號或密碼錯誤。
                             - 'CANT_RESPONSE': 已結案並標記, 不得回應。
                             - 'NO_FAST_COMMENT': 推文間隔太短。

@@ -126,6 +126,8 @@ def test_switch_to_dead_relogs():
     tools["switch_account"]("default")
     tools["switch_account"]("alt")
     svc_default.alive = False                     # 模擬 server 端閒置斷線
+    # 退回上次登入時間，避開 LOGIN_MIN_INTERVAL 的登入頻率限制。
+    ms["last_login_at"]["default"] -= api_ptt.LOGIN_MIN_INTERVAL
 
     result = tools["switch_account"]("default")
     assert result["success"] is True
